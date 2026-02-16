@@ -16,6 +16,7 @@ export interface UserConfig {
   level: 1 | 2 | 3;
   targetLanguage: 'en' | 'zh' | 'ja';
   showHighlight: boolean;
+  fontSize: number; // Font size percentage (80-150)
 }
 
 export interface AnnotatorOptions {
@@ -35,6 +36,7 @@ export const DEFAULT_CONFIG: UserConfig = {
   level: 2,
   targetLanguage: 'en',
   showHighlight: true,
+  fontSize: 100, // Default 100% (was 0.5em, now 0.6em base)
 };
 
 export const STORAGE_KEYS = {

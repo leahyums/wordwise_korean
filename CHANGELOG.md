@@ -2,6 +2,27 @@
 
 All notable changes to WordWise Korean will be documented in this file.
 
+## [0.1.1] - 2026-02-16
+
+### Added
+- **Font Size Control**: New slider in popup to adjust translation text size (80%-150%)
+  - Real-time updates without page reload
+  - Optimized to only update CSS, no re-annotation needed
+  - Preference saved across all websites
+- **Better Readability**: Increased default annotation font size from 0.5em to 0.6em (20% larger)
+  - Much more readable in emails and pages with small text
+  - Better visibility on high-resolution screens
+
+### Changed
+- **Simplified Language Options**: Hidden Chinese and Japanese options in popup
+  - Only English available currently (others are placeholders)
+  - Added note: "Chinese & Japanese translations coming soon!"
+  - Reduces user confusion about unavailable features
+
+### Technical
+- Dynamic font size injection based on user preference
+- Optimized setting changes to avoid unnecessary re-annotation
+
 ## [0.1.0] - 2026-02-16
 
 ### Initial Release

@@ -1,8 +1,25 @@
-# WordWise Korean v0.1.0
+# WordWise Korean v0.1.1
 
-**First public release!** Browser extension for Korean vocabulary learning with complete TOPIK I + II coverage.
+**Font size control & improved readability!** Browser extension for Korean vocabulary learning with complete TOPIK I + II coverage.
 
-## ✨ Features
+## ✨ What's New in v0.1.1
+
+### Added Features
+- **🎚️ Font Size Control** - New slider in popup to adjust translation text size
+  - Range: 80% to 150% in 5% increments
+  - Real-time updates without page reload
+  - Perfect for emails, small text, or accessibility needs
+  
+### Improvements
+- **⬆️ Larger Default Size** - Increased from 0.5em to 0.6em (20% bigger!)
+  - Much more readable in emails and small text areas
+  - Better visibility on high-resolution displays
+  
+- **🌐 Simplified Language Options** - Hidden Chinese/Japanese (coming soon!)
+  - Only English available for now (other translations in progress)
+  - Reduced confusion about unavailable features
+
+## ✨ Core Features
 
 - **4,341 TOPIK I & II vocabulary words** - Complete beginner to intermediate coverage
 - **Smart conjugation matching** - Handles verb and adjective variations automatically
@@ -15,7 +32,7 @@
 
 ## 📥 Installation
 
-1. **Download** `wordwise-korean-0.1.0-chrome.zip` below
+1. **Download** `wordwise-korean-0.1.1-chrome.zip` below
 2. **Extract** the ZIP file to a folder
 3. **Open Chrome** and go to `chrome://extensions/`
 4. **Enable** "Developer mode" (toggle in top right)

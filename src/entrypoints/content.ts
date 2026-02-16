@@ -11,7 +11,7 @@ export default defineContentScript({
   
   async main() {
     console.log('========================================');
-    console.log('WordWise Korean v0.1.0 - First Release');
+    console.log('WordWise Korean v0.1.1 - Font Size Control');
     console.log('========================================');
 
     // Load user configuration from storage
@@ -25,8 +25,8 @@ export default defineContentScript({
     // Create annotator
     const annotator = new WordWiseAnnotator(vocabulary, config);
 
-    // Inject styles
-    injectStyles();
+    // Inject styles with user's font size preference
+    injectStyles(config.fontSize);
 
     // Process initial page content
     if (config.enabled) {
@@ -79,8 +79,15 @@ export default defineContentScript({
             annotator.setUpdating(false);
           }
         } else if (newConfig.enabled) {
+          // If fontSize changed alone, just update styles without re-annotation
+          if (newConfig.fontSize !== oldConfig.fontSize &&
+              newConfig.level === oldConfig.level &&
+              newConfig.targetLanguage === oldConfig.targetLanguage &&
+              newConfig.showHighlight === oldConfig.showHighlight) {
+            updateFontSize(newConfig.fontSize);
+          }
           // If level, language, or highlight changed, re-annotate
-          if (
+          else if (
             newConfig.level !== oldConfig.level ||
             newConfig.targetLanguage !== oldConfig.targetLanguage ||
             newConfig.showHighlight !== oldConfig.showHighlight
@@ -132,8 +139,14 @@ export default defineContentScript({
 /**
  * Inject CSS styles for ruby tags and annotations
  */
-function injectStyles(): void {
-  if (document.getElementById('wordwise-korean-styles')) return;
+function injectStyles(fontSize: number = 100): void {
+  if (document.getElementById('wordwise-korean-styles')) {
+    updateFontSize(fontSize);
+    return;
+  }
+
+  const baseFontSize = 0.6; // Base size in em
+  const fontSizeEm = (baseFontSize * fontSize) / 100;
 
   const style = document.createElement('style');
   style.id = 'wordwise-korean-styles';
@@ -145,7 +158,7 @@ function injectStyles(): void {
     }
 
     ruby.word-wise-korean rt {
-      font-size: 0.5em;
+      font-size: ${fontSizeEm}em; /* Dynamic based on user preference */
       color: inherit;
       font-weight: 500;
       line-height: 1;
@@ -168,5 +181,24 @@ function injectStyles(): void {
   `;
 
   document.head.appendChild(style);
-  console.log('WordWise Korean: Styles injected');
+  console.log(`WordWise Korean: Styles injected (fontSize: ${fontSize}%)`);
+}
+
+/**
+ * Update font size dynamically
+ */
+function updateFontSize(fontSize: number): void {
+  const styleElement = document.getElementById('wordwise-korean-styles');
+  if (!styleElement) return;
+
+  const baseFontSize = 0.6; // Base size in em
+  const fontSizeEm = (baseFontSize * fontSize) / 100;
+
+  // Update the font-size in the existing style
+  styleElement.textContent = styleElement.textContent?.replace(
+    /font-size: [\d.]+em;/,
+    `font-size: ${fontSizeEm}em;`
+  ) || '';
+  
+  console.log(`WordWise Korean: Font size updated to ${fontSize}% (${fontSizeEm}em)`);
 }

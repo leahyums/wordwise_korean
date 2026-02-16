@@ -49,9 +49,32 @@
           class="select-input"
         >
           <option value="en">🇬🇧 English</option>
-          <option value="zh">🇨🇳 Chinese</option>
-          <option value="ja">🇯🇵 Japanese</option>
+          <!-- Chinese and Japanese coming soon -->
         </select>
+        <p class="setting-hint" style="color: #a0aec0; font-style: italic;">
+          Chinese & Japanese translations coming soon!
+        </p>
+      </div>
+
+      <!-- Font Size -->
+      <div class="setting-group">
+        <label class="setting-label">
+          Translation Size: {{ config.fontSize }}%
+        </label>
+        <input
+          type="range"
+          v-model.number="config.fontSize"
+          @input="saveConfig"
+          min="80"
+          max="150"
+          step="5"
+          class="slider-input"
+        />
+        <div class="size-labels">
+          <span>Small</span>
+          <span>Normal</span>
+          <span>Large</span>
+        </div>
       </div>
 
       <!-- Show Highlight -->
@@ -316,5 +339,53 @@ async function saveConfig() {
   margin: 0;
   font-size: 12px;
   color: #718096;
+}
+
+.slider-input {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.slider-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #667eea;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.slider-input::-webkit-slider-thumb:hover {
+  background: #5568d3;
+}
+
+.slider-input::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #667eea;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s;
+}
+
+.slider-input::-moz-range-thumb:hover {
+  background: #5568d3;
+}
+
+.size-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #a0aec0;
 }
 </style>
