@@ -41,8 +41,6 @@ Hello      friend        library
 5. Click "Load unpacked" and select the extracted folder
 6. Click the extension icon and enable it!
 
-> 📖 See [INSTALL.md](INSTALL.md) for detailed installation instructions and troubleshooting.
-
 ### For Developers
 
 1. **Install dependencies**:

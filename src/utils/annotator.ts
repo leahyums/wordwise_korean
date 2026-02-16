@@ -224,7 +224,7 @@ export class WordWiseAnnotator {
    * Remove all annotations from the page
    */
   clearAnnotations(): void {
-    console.log('WordWise Korean: Clearing annotations [v2.2.5]');
+    console.log('WordWise Korean: Clearing annotations [v0.1.0]');
     
     // Strategy: Replace each ruby tag directly with its base text (excluding <rt>)
     const rubyTags = Array.from(document.querySelectorAll(`ruby.${ANNOTATION_CLASS}`));

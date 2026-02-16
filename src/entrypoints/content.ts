@@ -11,7 +11,7 @@ export default defineContentScript({
   
   async main() {
     console.log('========================================');
-    console.log('WordWise Korean: v2.2.5 - FIX: Exclude common grammar particles (은/는/이/가/etc.)');
+    console.log('WordWise Korean v0.1.0 - First Release');
     console.log('========================================');
 
     // Load user configuration from storage
