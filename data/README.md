@@ -1,8 +1,10 @@
-# Vocabulary Source Data
+# Vocabulary Data & Customization Guide
 
-This directory contains the raw source text files for TOPIK vocabulary.
+This directory contains the raw source text files for TOPIK vocabulary and instructions for extending the vocabulary database.
 
-## Files
+---
+
+## 📁 Source Files
 
 ### `topik-1671-words.txt`
 - **Source**: [TOPIK I Vocabulary List (Tammy Korean)](https://learning-korean.com/elementary/20210101-10466/)
@@ -18,7 +20,77 @@ This directory contains the raw source text files for TOPIK vocabulary.
 - **Used by**: `scripts/pdf-to-vocab.js --level 2 --merge`
 - **Result**: 2,660 unique words imported, merged to 4,341 total words
 
-## How to Extract Text from PDF
+---
+
+## 📊 Current Status
+
+**✅ Completed: 4,341 words imported!**
+- TOPIK I: 1,578 words
+- TOPIK Ⅱ: 2,729 words (including 34 advanced level words)
+
+| Level | Words | Verbs/Adj (ending in 다) | Expressions |
+|-------|-------|------------------------|-------------|
+| TOPIK I | 1,578 | ~400 | ~50 |
+| TOPIK Ⅱ | 2,729 | ~800 | ~100 |
+| **Total** | **4,341** | **~1,200** | **~150** |
+
+**Next Steps (Optional):**
+- Add accurate Chinese/Japanese translations using batch-translate.js
+- Fine-tune verb/adjective conjugation matching
+- Add user custom vocabulary feature
+
+---
+
+## 🎨 Customizing Vocabulary
+
+### Method 1: Add/Edit Words Manually
+
+Edit `src/assets/topik-vocab.json` directly:
+
+```json
+{
+  "word": "단어",
+  "level": 1,
+  "pos": "noun",
+  "translations": {
+    "en": "word",
+    "zh": "单词",
+    "ja": "単語"
+  }
+}
+```
+
+### Method 2: Import from CSV
+
+```bash
+# Convert CSV to JSON
+node scripts/csv-to-vocab.js mywords.csv --merge
+
+# CSV format: word,level,en,zh,ja
+# Example:
+# 친구,1,friend,朋友,友達
+# 학교,1,school,学校,学校
+```
+
+### Method 3: Parse PDF Text
+
+```bash
+# Extract text from PDF and parse
+node scripts/pdf-to-vocab.js extracted-text.txt --level 1 --merge
+```
+
+### Method 4: Batch Translate
+
+```bash
+# Auto-translate missing languages using AI
+node scripts/batch-translate.js src/assets/topik-vocab.json
+```
+
+See [scripts/README.md](../scripts/README.md) for detailed documentation on all scripts.
+
+---
+
+## 🔧 How to Extract Text from PDF
 
 1. **Download PDF** from the source links above
 2. **Open in browser** or PDF reader
@@ -34,7 +106,7 @@ This directory contains the raw source text files for TOPIK vocabulary.
    node scripts/pdf-to-vocab.js data/topik-2662-words.txt --level 2 --merge
    ```
 
-## Text Format Example
+### Text Format Example
 
 ```
 TOPIKⅠVocabulary（Beginner)
@@ -52,15 +124,53 @@ The parser handles:
 - English translations
 - Section headers (automatically skipped)
 
-## Usage in Extension
+---
 
-These source files are **not** loaded by the extension. They are:
-1. Parsed by `pdf-to-vocab.js` to create JSON
-2. Output to `src/assets/topik-vocab-from-pdf.json`
-3. Manually moved to `src/assets/topik-vocab.json`
-4. Bundled into the extension at build time
+## 🚀 Expanding to Full TOPIK Vocabulary
 
-## Regenerating Vocabulary
+### Option 1: Download Existing Word Lists 🔥 RECOMMENDED
+
+**Free Resources:**
+1. **TOPIK Guide** - https://www.topikguide.com/download-complete-list-of-topik-vocabulary/
+2. **Talk To Me In Korean (TTMIK)** - https://talktomeinkorean.com/curriculum/
+3. **How To Study Korean** - https://www.howtostudykorean.com/korean-vocabulary-lists/
+4. **Korean Class 101** - https://www.koreanclass101.com/korean-word-lists/
+5. **Anki Decks** - Search "TOPIK" on AnkiWeb, export to CSV
+
+**Steps:**
+1. Download word list (usually Excel/CSV)
+2. Convert to JSON format using `csv-to-vocab.js`
+3. Merge with existing vocabulary
+
+### Option 2: Use National Institute of Korean Language API
+
+**KRDICT API** (Official Korean Learners' Dictionary):
+- Website: https://krdict.korean.go.kr/
+- Free API for programmatic access
+- Contains all TOPIK vocabulary with definitions
+- Multilingual translations included
+
+**Implementation:**
+```javascript
+// Fetch from KRDICT API and convert to our format
+async function fetchKRDICT(word) {
+  const url = `https://krdict.korean.go.kr/api/search?key=YOUR_KEY&q=${word}`;
+  // Process response and extract translations
+}
+```
+
+### Option 3: Manual Expansion
+
+**Add words as you encounter them:**
+1. Copy the structure from `topik-vocab.json`
+2. Use online dictionaries for translations:
+   - Naver Dictionary: https://dict.naver.com/
+   - Papago: https://papago.naver.com/
+3. Add to appropriate level (1-3)
+
+---
+
+## 🔄 Regenerating Vocabulary
 
 To rebuild the vocabulary from scratch:
 
@@ -78,26 +188,154 @@ Move-Item src/assets/topik-vocab-from-pdf.json src/assets/topik-vocab.json -Forc
 pnpm dev
 ```
 
-## Sources & Attribution
+---
+
+## 🎨 Customizing Annotation Styling
+
+Edit the CSS in `src/entrypoints/content.ts`:
+
+```css
+ruby.word-wise-korean rt {
+  font-size: 0.55em;      /* Adjust translation size */
+  color: #667eea;         /* Change color */
+  font-weight: 600;       /* Adjust weight */
+  line-height: 1;         /* Vertical spacing */
+}
+
+/* Optional highlight under words */
+ruby.word-wise-highlight {
+  background: linear-gradient(transparent 70%, rgba(102, 126, 234, 0.12) 70%);
+  border-radius: 2px;
+  padding: 0 1px;
+}
+```
+
+---
+
+## 🌐 Translation Services for Batch Processing
+
+### Free Options:
+- **Google Translate API** (Free tier: 500k chars/month)
+- **ChatGPT/Claude** (Free tier available)
+- **Papago API** (Great for Korean, free tier exists)
+
+### Using the Batch Translation Script:
+
+```bash
+# Set your API key (OpenAI example)
+export OPENAI_API_KEY="sk-..."
+
+# Run batch translation
+node scripts/batch-translate.js src/assets/topik-vocab.json
+
+# This will update missing Chinese/Japanese translations
+```
+
+See the script for other API providers (Anthropic, Google, etc.)
+
+---
+
+## 📈 File Size Estimates
+
+| Word Count | File Size (JSON) | Gzipped | Load Time |
+|------------|------------------|---------|-----------|
+| 243 | 25 KB | ~8 KB | < 1ms |
+| 800 | 82 KB | ~27 KB | < 5ms |
+| 3,000 | 310 KB | ~103 KB | < 20ms |
+| 6,000 | 620 KB | ~207 KB | < 40ms |
+
+**Conclusion**: Even 6,000 words is very manageable! ✅
+
+---
+
+## ✅ Quality Control
+
+Before adding words, verify:
+- [ ] Correct Korean spelling (including spacing)
+- [ ] Accurate part of speech (noun/verb/adjective/etc.)
+- [ ] Natural translations (not machine-literal)
+- [ ] Appropriate TOPIK level assignment
+- [ ] Consistent JSON formatting
+
+---
+
+## 🧪 Testing Your Expanded Vocabulary
+
+After adding words:
+
+```bash
+# Rebuild extension
+pnpm dev
+
+# Test on these sites:
+# - https://ko.wikipedia.org/
+# - https://news.naver.com/
+# - Korean learning blogs
+```
+
+Check browser console for:
+- "Loaded X vocabulary words" (should show your new count)
+- "Added X annotations" (should increase)
+
+---
+
+## 🎯 Usage in Extension
+
+These source files are **not** loaded by the extension. They are:
+1. Parsed by `pdf-to-vocab.js` to create JSON
+2. Output to `src/assets/topik-vocab-from-pdf.json`
+3. Manually moved to `src/assets/topik-vocab.json`
+4. Bundled into the extension at build time
+
+---
+
+## 📜 Sources & Attribution
 
 - **TOPIK I & II Lists**: [Tammy Korean (learning-korean.com)](https://learning-korean.com/)
 - **License**: Educational use - check source website for specific terms
 - **Credit**: Thank you to Tammy Korean for providing free TOPIK vocabulary resources!
 
-## Statistics
+---
 
-| Level | Words | Verbs/Adj (ending in 다) | Expressions |
-|-------|-------|------------------------|-------------|
-| TOPIK I | 1,578 | ~400 | ~50 |
-| TOPIK Ⅱ | 2,729 | ~800 | ~100 |
-| **Total** | **4,341** | **~1,200** | **~150** |
+## 🗺️ Recommended Workflow
 
-## Updating Vocabulary
+### Phase 1: Get Core Vocabulary ✅ COMPLETED
+1. ✅ Downloaded TOPIK I word list (1,671 words)
+2. ✅ Parsed and imported 1,668 unique words
+3. ✅ Added to `topik-vocab.json`
 
-To add more words or update translations:
+### Phase 2: Expand to Full TOPIK II ✅ COMPLETED
+1. ✅ Downloaded TOPIK II additions (2,662 words)
+2. ✅ Parsed and imported 2,660 unique words
+3. ✅ Merged with existing file → **4,341 total words**
 
-1. **Edit source files** in this directory, or
-2. **Use CSV converter**: `node scripts/csv-to-vocab.js mywords.csv --merge`
-3. **Batch translate**: `node scripts/batch-translate.js src/assets/topik-vocab.json`
+### Phase 3: Conjugation Handling ✅ IMPLEMENTED
+1. ✅ Stem extraction algorithm handles most cases
+2. ✅ Supports 30+ common verb/adjective endings
+3. ✅ Fallback matching for edge cases
 
-See [scripts/README.md](../scripts/README.md) for detailed documentation.
+### Phase 4: Translation Quality (Optional - Future)
+1. Run batch translation for Chinese/Japanese
+2. Manual review and correction
+3. User testing and refinement
+
+---
+
+## 🚀 Next Steps (Quick Wins)
+
+**1 Hour Project:**
+1. Download a TOPIK I CSV from TOPIK Guide
+2. Use ChatGPT to convert to JSON format
+3. Merge with current file using `csv-to-vocab.js --merge`
+4. → You'll have even more words!
+
+**1 Week Project (Carefully Curated):**
+1. Get official TOPIK word lists (I-VI)
+2. Professional translation review
+3. Add common conjugations
+4. User testing and refinement
+5. → You'll have 6,000+ words!
+
+---
+
+For more information on the vocabulary management scripts, see [scripts/README.md](../scripts/README.md).

@@ -30,7 +30,20 @@ Hello      friend        library
 
 ## 🚀 Installation
 
-### For Development
+### For Users
+
+**Download the extension:**
+
+1. Get the latest ZIP from [GitHub Releases](https://github.com/leahyums/wordwise_korean/releases/latest)
+2. Extract the ZIP file
+3. Open Chrome and go to `chrome://extensions/`
+4. Enable "Developer mode" (toggle in top right)
+5. Click "Load unpacked" and select the extracted folder
+6. Click the extension icon and enable it!
+
+> 📖 See [INSTALL.md](INSTALL.md) for detailed installation instructions and troubleshooting.
+
+### For Developers
 
 1. **Install dependencies**:
 ```bash
@@ -103,10 +116,9 @@ wordwise_korean/
 │   ├── batch-translate.js      # AI translation tool
 │   └── README.md               # Scripts documentation
 ├── data/
+│   ├── README.md               # Vocabulary customization guide
 │   ├── topik-1671-words.txt    # TOPIK I source text
 │   └── topik-2662-words.txt    # TOPIK II source text
-├── docs/
-│   └── VOCABULARY-EXPANSION.md # Vocabulary guide
 ├── public/                     # Static assets
 ├── wxt.config.ts              # WXT configuration
 └── package.json
@@ -119,37 +131,6 @@ wordwise_korean/
 - **Styling**: Native CSS with ruby tag support
 - **Build**: Vite
 - **Manifest**: V3 (Chrome/Edge/Firefox compatible)
-
-## 🎨 Customization
-
-### Adding Vocabulary
-
-Edit `src/assets/topik-vocab.json` or use our vocabulary management scripts:
-
-```bash
-# Convert CSV to JSON
-node scripts/csv-to-vocab.js mywords.csv --merge
-
-# Parse PDF text
-node scripts/pdf-to-vocab.js extracted-text.txt --level 1 --merge
-
-# Auto-translate missing languages
-node scripts/batch-translate.js src/assets/topik-vocab.json
-```
-
-See [scripts/README.md](scripts/README.md) for detailed documentation.
-
-### Styling Annotations
-
-Edit the CSS in `src/entrypoints/content.ts`:
-
-```css
-ruby.word-wise-korean rt {
-  font-size: 0.55em;      /* Adjust translation size */
-  color: #667eea;         /* Change color */
-  font-weight: 600;       /* Adjust weight */
-}
-```
 
 ## 🐛 Troubleshooting
 
@@ -198,10 +179,16 @@ Contributions welcome! Please:
 5. Open a Pull Request
 
 ### Adding Vocabulary
+
+Want to expand or customize the vocabulary? See [data/README.md](data/README.md) for:
+- How to add words from CSV or PDF files
+- Batch translation guide
+- Styling customization
+- Quality control checklist
+
 Priority areas:
-- Expand TOPIK 1-2 vocabulary (currently 20 words)
 - Add TOPIK 3-6 levels
-- Improve translations accuracy
+- Improve Chinese/Japanese translations accuracy
 - Add part-of-speech information
 
 ## 📄 License
