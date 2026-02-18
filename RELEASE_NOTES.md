@@ -25,7 +25,8 @@
 - **Smart conjugation matching** - Handles verb and adjective variations automatically
 - **Grammar particle filtering** - Excludes common particles (은/는/이/가/을/를/etc.) for cleaner text
 - **Three vocabulary levels** - Choose TOPIK I, TOPIK Ⅱ, or All
-- **Multiple languages** - English, Chinese, and Japanese translations
+- **Multiple vocabulary sources** - Over 4,341 words from TOPIK I & II
+- **English translations** - High-quality English translations (Chinese & Japanese coming soon!)
 - **Dynamic content support** - Works on modern websites, SPAs, infinite scroll
 - **Optional highlighting** - Visual emphasis for annotated words
 - **Privacy-focused** - All processing happens locally, no data collection
@@ -99,7 +100,7 @@
 
 This is a beta release for community testing before Chrome Web Store publication:
 
-- Chinese and Japanese translations are currently English-based placeholders (working on improvements!)
+- Currently only English translations available (Chinese & Japanese coming soon!)
 - Chrome may disable developer mode extensions after browser restart (normal behavior - simply re-enable)
 - Some dynamic websites may require a page refresh after changing settings
 - Not yet available on Chrome Web Store (manual installation required)
@@ -107,7 +108,7 @@ This is a beta release for community testing before Chrome Web Store publication
 ## 🔮 Coming Soon
 
 - Chrome Web Store publication
-- Improved Chinese and Japanese translations
+- Chinese and Japanese translation support
 - User custom vocabulary feature
 - Learning statistics dashboard
 - Audio pronunciation support

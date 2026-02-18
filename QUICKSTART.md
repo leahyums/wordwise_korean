@@ -54,7 +54,7 @@ Try these sites:
 2. A popup will open with settings:
    - **Toggle**: Turn on/off
    - **Level**: Choose TOPIK I (~1,600 words), TOPIK Ⅱ (~2,700 words), or All (~4,300 words)
-   - **Language**: English, Chinese, or Japanese
+   - **Language**: English (Chinese & Japanese coming soon!)
    - **Highlight**: Show background highlight
 3. Changes apply immediately!
 

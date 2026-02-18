@@ -6,7 +6,7 @@ A browser extension that adds Kindle Word Wise style annotations for Korean lang
 
 - **Instant Translations**: Korean vocabulary words are automatically annotated with translations above them
 - **TOPIK Levels**: Filter vocabulary by TOPIK I, TOPIK Ⅱ, or all levels (4,341 words)
-- **Multiple Languages**: Choose translations in English, Chinese, or Japanese
+- **English Translations**: High-quality English translations (Chinese & Japanese coming soon!)
 - **Smart Matching**: Handles verb/adjective conjugations with stem extraction
 - **Grammar Particle Filtering**: Excludes common particles (은/는/이/가/을/를/etc.) to avoid cluttering text
 - **Dynamic Content**: Works on single-page applications with real-time updates
@@ -89,7 +89,7 @@ Output will be in `.output/` directory.
    - **TOPIK I**: Basic vocabulary (1,578 words)
    - **TOPIK Ⅱ**: Intermediate/Advanced (2,729 words)
    - **All**: Complete vocabulary (4,341 words)
-4. Choose your preferred translation language
+4. Adjust settings like translation size and highlighting
 5. Visit any Korean website and see translations appear!
 
 ## 🏗️ Project Structure
@@ -187,9 +187,8 @@ Want to expand or customize the vocabulary? See [data/README.md](data/README.md)
 - Quality control checklist
 
 Priority areas:
-- Add TOPIK 3-6 levels
-- Improve Chinese/Japanese translations accuracy
-- Add part-of-speech information
+- Add Chinese and Japanese translation support
+- Expand vocabulary coverage within existing levels
 
 ## 📄 License
 
@@ -206,10 +205,10 @@ MIT License - feel free to use this project for learning and development!
 - [x] Expand vocabulary to TOPIK I + II (4,341 words)
 - [x] Handle Korean verb/adjective conjugations
 - [x] Filter common grammar particles
+- [ ] Add Chinese and Japanese translation support
 - [ ] Add user custom vocabulary
 - [ ] Statistics dashboard (words learned, pages visited)
 - [ ] Export/import vocabulary lists
-- [ ] Improve Chinese/Japanese translations accuracy
 - [ ] Pronunciation audio support
 - [ ] Spaced repetition learning features
 
