@@ -10,15 +10,12 @@ A browser extension that adds Kindle Word Wise style annotations for Korean lang
 
 ## ✨ Features
 
-- **Instant Translations**: Korean vocabulary words are automatically annotated with translations above them
-- **TOPIK Levels**: Filter vocabulary by TOPIK I, TOPIK Ⅱ, or all levels (**6,065 words**)
-- **English Translations**: High-quality English translations (Chinese & Japanese coming soon!)
-- **Smart Matching**: POS-aware two-pass lookup handles verb/adjective conjugations and correctly resolves noun/verb ambiguity (살/살다, 배우/배우다, 서/서다, 해요/하다)
-- **Clean Translations**: Parenthetical notes, tilde meta-descriptions, and near-synonyms automatically stripped for concise display
-- **Grammar Particle Filtering**: Excludes common particles (은/는/이/가/을/를/etc.) to avoid cluttering text
-- **Dynamic Content**: Works on single-page applications with real-time updates
-- **Visual Highlight**: Optional background highlight for annotated words
-- **Privacy First**: All processing happens locally - no data sent to servers
+- **6,065 TOPIK words** — I (beginner) · II (intermediate) · or all levels
+- **Always-visible annotations** — translations above words, no hover needed
+- **Smart conjugation matching** — handles verb/adjective forms and noun/verb ambiguity
+- **Clean translations** — parentheticals and verbose prefixes stripped automatically
+- **Any Korean site** — works on SPAs with real-time MutationObserver support
+- **100% local** — no data collection, no external API calls
 
 ## 🎯 How It Works
 
