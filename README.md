@@ -2,6 +2,12 @@
 
 A browser extension that adds Kindle Word Wise style annotations for Korean language learning. Translations appear directly above vocabulary words - always visible, no hover needed!
 
+🌐 **[Live Demo & Landing Page](https://multilingual-lab.github.io/wordwise_korean/)**
+
+
+![Demo Screenshot](.github/images/landingpage.jpg)
+
+
 ## ✨ Features
 
 - **Instant Translations**: Korean vocabulary words are automatically annotated with translations above them
@@ -22,14 +28,6 @@ When you visit a Korean website, the extension:
 2. Matches words against your vocabulary level
 3. Adds ruby tags with translations above words
 4. Watches for new content and annotates it automatically
-
-Example:
-```
-Hello     friend     library
-안녕하세요! 친구와 함께 도서관에 갔어요.
-```
-
-![Demo Screenshot](.github/images/demo-x.jpg)
 
 ## 🚀 Installation
 
