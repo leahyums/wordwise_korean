@@ -20,6 +20,7 @@
     "vue": "^3.4.21"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@types/chrome": "^0.0.260",
     "@vitejs/plugin-vue": "^5.0.4",
     "typescript": "^5.3.3",
