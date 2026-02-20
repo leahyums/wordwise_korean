@@ -1,6 +1,6 @@
 import type { VocabEntry, UserConfig, TextReplacement } from '@/types';
 import { getTranslation } from './vocabulary-loader';
-import { extractStems } from './korean-stem';
+import { extractStemsForLookup, VERB_POS } from './korean-stem';
 
 // Tags to skip during annotation
 const SKIP_TAGS = new Set([
@@ -135,15 +135,37 @@ export class WordWiseAnnotator {
       
       // Skip if already matched
       if (matched.has(index)) continue;
+
+      // Skip Korean tokens directly preceded by a digit — these are digit-Korean
+      // compounds (counters/ordinals: 1심, 2층, 10명, 5월, 20살) where the standalone
+      // vocab meaning of the Korean syllable is always wrong. A space between the
+      // digit and the Korean word is safe: text[index-1] would be ' ', not a digit.
+      if (index > 0 && /[0-9]/.test(text[index - 1])) continue;
       
       // First try exact match
       let entry = this.vocabulary.get(word);
       // If no exact match, try stem matching for verbs/adjectives
       if (!entry) {
-        const stems = extractStems(word);
-        for (const stem of stems) {
-          if (this.vocabulary.has(stem)) {
-            entry = this.vocabulary.get(stem)!;
+        const candidates = extractStemsForLookup(word);
+        // Pass 1: POS-aware — when a verb-only ending was stripped, reject noun matches
+        // to prevent collisions like 서고→서 "west" shadowing 서다 "stand".
+        for (const { stem, verbOnly } of candidates) {
+          const candidate = this.vocabulary.get(stem);
+          if (candidate && (!verbOnly || (candidate.pos != null && VERB_POS.has(candidate.pos)))) {
+            entry = candidate;
+            break;
+          }
+        }
+        // Pass 2: graceful fallback — only relaxes the POS constraint when the
+        // entry has no pos field (data gap). It still blocks nouns/pronouns when
+        // verbOnly:true so we never annotate '서' "west" for '서고' "stand+and".
+        if (!entry) {
+          for (const { stem, verbOnly } of candidates) {
+            const candidate = this.vocabulary.get(stem);
+            if (!candidate) continue;
+            // If pos is present and this was a verb-only stripped ending, enforce POS
+            if (verbOnly && candidate.pos != null && !VERB_POS.has(candidate.pos)) continue;
+            entry = candidate;
             break;
           }
         }

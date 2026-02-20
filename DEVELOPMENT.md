@@ -135,6 +135,7 @@ interface VocabEntry {
 - Grammar particles excluded: 20 common particles (은/는/이/가/을/를/의/도/와/과/etc.)
 - Translations: English only (Chinese & Japanese are placeholders)
 - All translations free of verbose `to /being /to be ` prefixes (stripped 2026-02-20)
+- Translation display: parentheticals stripped, tilde meta-descriptions removed, near-synonyms deduplicated
 
 **File Size:** ~1 MB (uncompressed JSON), ~630 KB after Vite bundling into content script
 
@@ -166,21 +167,36 @@ pnpm test:watch    # Watch mode during development
 | `src/tests/vocab-translations.test.ts` | Data integrity, polysemous word protection, verbose prefix removal, concise translation selection, new TOPIK II word coverage |
 | `src/tests/stem-matching.test.ts` | `extractStems()` output, past/present/connector conjugation resolution, `couldBeConjugationOf()`, known limitations |
 
-**Current results: 78/78 tests passing**
+**Current results: 109/109 tests passing**
 
-### Known Stem-Matching Bugs (Documented in Tests as `Known Limitations`)
+### Stem-Matching Architecture (v0.1.2)
 
-These bugs are identified by tests and tracked for the next fix iteration:
+The annotator uses a **POS-aware two-pass lookup**:
 
-| Input | Expected | Actual | Root Cause |
-|-------|----------|--------|------------|
-| `살았어요` | `살다` (live) | `살` (flesh) | Bare stem `살` hits vocab before `살다` |
-| `배우니까` | `배우다` (learn) | `배우` (actor) | Noun `배우` shadows verb stem |
-| `가고` | `가다` (go) | `가` (professional) | Single-char `가` entry intercepts |
-| `가서` | `가다` (go) | `undefined` | ㅏ-ending contraction not in `VERB_ENDINGS` |
-| `해요` | `하다` (do) | `undefined` | 하다 irregular `하+여→해` not handled |
+1. **`extractStemsForLookup(word)`** returns `StemCandidate[]` each with a `verbOnly` flag
+   - `verbOnly=true` when the suffix is grammatically impossible after a noun (`고`, `니까`, `었어요`, etc.)
+   - `는`/`은` are treated as ambiguous: single-char stem → `verbOnly=true`, longer stem → `verbOnly=false`
+   - `HA_IRREGULAR_ENDINGS` maps `해요/했어요` → `하` base
 
-**Fix strategy**: In `annotator.ts`, prefer the longest-matching stem when resolving via `extractStems()`. Also add `아서/어서` contraction patterns directly (e.g. `가서→가다`).
+2. **Pass 1** (POS-enforced): accept candidate only if `!verbOnly || VERB_POS.has(candidate.pos)`
+
+3. **Pass 2** (graceful fallback): same but allows entries with `pos == undefined` — still blocks known nouns when `verbOnly=true`
+
+### Digit-Compound Guard
+
+In `findReplacements()`, a Korean token is skipped if the preceding character is a digit:
+```typescript
+if (index > 0 && /[0-9]/.test(text[index - 1])) continue;
+```
+Prevents `1심`, `2층`, `3복`, etc. from being annotated.
+
+### Known Stem-Matching Limitations
+
+| Input | Expected | Status |
+|-------|----------|--------|
+| `가서` | `가다` (go) | ❌ unhandled — Unicode ㅐ-contraction |
+
+All other previously-known collisions (살/살다, 배우/배우다, 서/서다, 해요/하다) are **resolved** in v0.1.2.
 
 ## Manual Testing Checklist
 
@@ -209,9 +225,7 @@ These bugs are identified by tests and tracked for the next fix iteration:
 ## Future Enhancements
 
 ### Short Term
-- [ ] Fix stem-matching collisions (살/살다, 배우/배우다, 가/가다) — prefer longer match in resolveToVocab
-- [ ] Add ㅏ/ㅓ-contraction patterns (가서→가다, 와서→오다)
-- [ ] Add 하다 irregular handling (해요→하다, 했어요→하다)
+- [ ] Add ㅐ/ㅓ-contraction patterns (`가서→가다`, `와서→오다`)
 - [ ] Improve Chinese/Japanese translations (use batch-translate.js)
 - [ ] Add statistics tracking
 - [ ] Performance monitoring dashboard
@@ -231,12 +245,16 @@ These bugs are identified by tests and tracked for the next fix iteration:
 
 ## Recent Bug Fixes & Improvements
 
-### v0.1.2 - Vocabulary expansion + translation quality (2026-02-20)
-**Added**: Merged extended TOPIK II word list → 6,065 total words (was 4,341)
-**Fixed**: 277 duplicate entries removed (same word at TOPIK I and II levels; kept lower level)
-**Fixed**: 260 verbose `to /being /to be ` prefixes stripped from translations
-**Fixed**: 1,283 translation conflicts resolved via smart merge (shorter/more concise wins; polysemous words protected)
-**Added**: Vitest test suite — 78 tests covering data integrity, translation precision, and stem matching
+### v0.1.2 - POS-aware stem lookup + translation cleanup (2026-02-20)
+**Added**: POS-aware `extractStemsForLookup()` with `verbOnly` flags; `VERB_ONLY_ENDINGS`, `AMBIGUOUS_ENDINGS`, `HA_IRREGULAR_ENDINGS`
+**Added**: Two-pass annotator lookup (Pass 1: POS-enforced, Pass 2: pos-absent relaxation)
+**Added**: Translation display cleanup — parenthetical stripping, tilde meta-description removal, 38-cluster synonym dedup
+**Fixed**: Noun/verb collisions: `살`/`살다`, `배우`/`배우다`, `서`/`서다`, `해요`/`하다`
+**Fixed**: Digit-compound annotation (1심, 2층 etc.) with digit guard
+**Fixed**: Level-switch crash: `oldConfig ?? DEFAULT_CONFIG`
+**Added**: Merged extended TOPIK II word list → 6,065 total words
+**Fixed**: 277 duplicate entries, 260 verbose prefixes, 1,283 translation conflicts
+**Added**: Vitest test suite — 78 → 109 tests
 
 ### v0.1.1 - Font size control (2026-02-16)
 See CHANGELOG.md for full details.
@@ -324,7 +342,7 @@ console.timeEnd('processNode');
 pnpm dev           # Development with hot reload
 pnpm build         # Production build
 pnpm compile       # Type check only
-pnpm test          # Run automated test suite (78 tests)
+pnpm test          # Run automated test suite (109 tests)
 pnpm test:watch    # Tests in watch mode
 pnpm zip           # Create distributable ZIP
 ```

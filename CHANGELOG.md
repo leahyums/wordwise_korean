@@ -5,30 +5,19 @@ All notable changes to WordWise Korean will be documented in this file.
 ## [0.1.2] - 2026-02-20
 
 ### Added
-- **Expanded Vocabulary**: 4,341 → **6,065 words** (net after dedup)
-  - Merged TOPIK II word list from `topik2-3900-vocab.json` (+1,725 new words)
+- **Expanded Vocabulary**: 4,341 → **6,065 words**
   - TOPIK I: 1,578 words (unchanged)
-  - TOPIK II: 2,729 → **4,487 words**
-- **Test Suite (Vitest)**: 78 automated tests across 2 files
-  - `src/tests/vocab-translations.test.ts` — translation precision, polysemous word protection, verbose prefix removal, new word coverage
-  - `src/tests/stem-matching.test.ts` — conjugation resolution, connector forms, `extractStems` output shape, known limitations
-  - Run with `pnpm test`
+  - TOPIK II: 2,729 → **4,487 words** (+1,725 new words, duplicates removed)
+- **Cleaner Translations**: English translations are now trimmed for display — parenthetical notes, unit markers (`~ piece(s)`, `~ minute(s)`), and near-synonyms (`autumn, fall` → `autumn`) are removed automatically
 
 ### Fixed
-- **277 Duplicate Entries Removed**: Same word appearing at both TOPIK I and TOPIK II levels — lower level (TOPIK I) kept
-- **260 Verbose Verb Prefixes Stripped**: Translations that started with `to `, `to be `, or `being ` were cleaned
-  - e.g. `가다` "to go" → "go", `길다` "to be long" → "long", `객관적` "being objective" → "objective"
-- **1,283 Translation Conflicts Resolved** via smart merge strategy:
-  - Strip verbose prefix from old translation, then pick shorter/more concise
-  - Protect polysemous words (both under 10 chars, no word overlap) — e.g. `감` = "persimmon" kept over "sense of", `가사` = "housework" kept over "lyrics"
-  - Result: 673 updated to new (more concise), 610 kept old (already precise)
+- **Wrong annotations on verb forms**: Words like `살았어요`, `배우니까`, `서고`, `서는`, `해요` now correctly resolve to their verb (`살다`, `배우다`, `서다`, `하다`) instead of a same-spelled noun
+- **Numbers before Korean no longer annotated**: `1심`, `2층`, `3복` etc. are skipped
+- **Extension crash on first level switch**: No longer crashes when switching level immediately after a fresh install
+- **Translation cleanup**: Removed verbose `to`/`to be`/`being` prefixes and resolved ~1,500 conflicting entries from the vocabulary expansion
 
-### Known Issues (Documented by Tests)
-- `가서` (가다 + ㅏ-contraction) produces no annotation — ㅏ-ending contraction not handled by stem extractor
-- `해요`/`했어요` (하다 irregular contraction) produces no annotation
-- `살았어요` → annotates as `살` ("flesh") instead of `살다` ("live") — bare stem hits before verb form
-- `배우니까` → annotates as `배우` ("actor") instead of `배우다` ("learn") — noun shadows verb stem
-- These are tracked for fixing in the next iteration; see `DEVELOPMENT.md` for details
+### Known Issues
+- `가서` (가다 + ㅏ-contraction) produces no annotation
 
 ## [0.1.1] - 2026-02-16
 

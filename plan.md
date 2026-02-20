@@ -8,7 +8,7 @@
 
 **Status**: ✅ **ACTIVE — v0.1.2 released 2026-02-20**
 
-**Latest Version**: v0.1.2 (Vocabulary expansion to 6,065 words, translation quality pass, 78-test Vitest suite)
+**Latest Version**: v0.1.2 (POS-aware stem lookup, translation display cleanup, digit-compound fix, 109-test suite)
 
 **Previous Version**: v0.1.1 (Font size control, simplified language options)
 
@@ -27,19 +27,15 @@ Translations appear **directly above** Korean words - always visible, no interac
 | Area | Status | Notes |
 |------|--------|-------|
 | Vocabulary | ✅ 6,065 words | TOPIK I: 1,578 · TOPIK II: 4,487 · deduplicated |
-| Translation quality | ✅ Audited | No verbose prefixes, polysemous words protected |
-| Conjugation matching | ⚠️ Partial | Works for most forms; 5 known failures (see DEVELOPMENT.md) |
-| Test suite | ✅ 78/78 passing | Vitest — `pnpm test` |
-| Build | ✅ Clean | ~718 KB total output |
+| Translation quality | ✅ Audited | No verbose prefixes; parentheticals, tildes, synonyms stripped |
+| Conjugation matching | ✅ POS-aware | Two-pass lookup; noun/verb collisions resolved; 하다 irregular handled |
+| Test suite | ✅ 109/109 passing | Vitest — `pnpm test` |
+| Build | ✅ Clean | ~1.36 MB content.js (unminified dev) |
 | Chinese/Japanese | ❌ Placeholder | Future work |
 | Stats dashboard | ❌ Not started | Future work |
 
 ### Known Bugs Pending Fix
-- `가서` → no annotation (ㅏ-contraction)
-- `해요`/`했어요` → no annotation (하다 irregular)
-- `살았어요` → shows `살` "flesh" instead of `살다` "live"
-- `배우니까` → shows `배우` "actor" instead of `배우다` "learn"
-- `가고` → shows `가` "professional" instead of `가다` "go"
+- `가서` → no annotation (Unicode ㅐ-contraction, requires syllable-block decomposition)
 
 ---
 

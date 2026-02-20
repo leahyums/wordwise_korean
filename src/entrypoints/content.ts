@@ -11,7 +11,7 @@ export default defineContentScript({
   
   async main() {
     console.log('========================================');
-    console.log('WordWise Korean v0.1.1 - Font Size Control');
+    console.log('WordWise Korean v0.1.2 - Stem Collision Fix');
     console.log('========================================');
 
     // Load user configuration from storage
@@ -44,8 +44,8 @@ export default defineContentScript({
       if (areaName !== 'sync') return;
       
       if (changes[STORAGE_KEYS.CONFIG]) {
-        const oldConfig = changes[STORAGE_KEYS.CONFIG].oldValue as UserConfig;
-        const newConfig = changes[STORAGE_KEYS.CONFIG].newValue as UserConfig;
+        const oldConfig = (changes[STORAGE_KEYS.CONFIG].oldValue ?? DEFAULT_CONFIG) as UserConfig;
+        const newConfig = (changes[STORAGE_KEYS.CONFIG].newValue ?? DEFAULT_CONFIG) as UserConfig;
         
         console.log('========================================');
         console.log('WordWise Korean: Config changed!');

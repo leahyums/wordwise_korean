@@ -1,8 +1,97 @@
-# WordWise Korean v0.1.1
+# WordWise Korean v0.1.2
 
-**Font size control & improved readability!** Browser extension for Korean vocabulary learning with complete TOPIK I + II coverage.
+**Smarter annotations, cleaner translations!** Browser extension for Korean vocabulary learning with complete TOPIK I + II coverage.
 
-## ✨ What's New in v0.1.1
+## ✨ What's New in v0.1.2
+
+### Fixed: Noun/Verb Annotation Collisions
+Korean words that double as nouns and verb stems are now correctly resolved using a POS-aware lookup engine:
+
+| Before | After |
+|--------|-------|
+| `살았어요` → `살` "flesh" ❌ | `살았어요` → `살다` "live" ✅ |
+| `배우니까` → `배우` "actor" ❌ | `배우니까` → `배우다` "learn" ✅ |
+| `서고`/`서는` → `서` "west" ❌ | `서고`/`서는` → `서다` "stand" ✅ |
+| `해요`/`했어요` → (nothing) ❌ | `해요`/`했어요` → `하다` "do" ✅ |
+
+### Fixed: Digit-Compound Annotation
+Numbers like `1심`, `2층`, `3복` no longer trigger spurious annotations on the Korean component.
+
+### Cleaner Translation Display
+Translations are now post-processed for concise display:
+- **Parenthetical notes removed**: `"(a local district) gun"` → `"gun"`
+- **Tilde meta-descriptions removed**: `"one, one of the ~"` → `"one"`, `"~ person(s), ~ minute(s)"` → `"person, minute"`
+- **Near-synonyms deduplicated**: `"autumn, fall"` → `"autumn"`, `"want, wish, desire"` → `"want"`, `"strange, funny, weird"` → `"strange"`
+
+### Expanded Vocabulary
+- **6,065 words** total (up from 4,341)
+- TOPIK I: 1,578 words | TOPIK II: 4,487 words
+
+## ✨ Core Features
+
+- **6,065 TOPIK I & II vocabulary words** — complete beginner to intermediate coverage
+- **POS-aware conjugation matching** — correctly resolves noun/verb ambiguity
+- **Clean translation display** — concise, no noise
+- **Grammar particle filtering** — excludes common particles (은/는/이/가/을/를/etc.)
+- **Three vocabulary levels** — TOPIK I, TOPIK Ⅱ, or All
+- **English translations** — high-quality (Chinese & Japanese coming soon!)
+- **Dynamic content support** — works on modern websites, SPAs, infinite scroll
+- **Optional highlighting** — visual emphasis for annotated words
+- **Privacy-focused** — all processing happens locally, no data collection
+
+## 📥 Installation
+
+1. **Download** `wordwise-korean-0.1.2-chrome.zip` below
+2. **Extract** the ZIP file to a folder
+3. **Open Chrome** and go to `chrome://extensions/`
+4. **Enable** "Developer mode" (toggle in top right)
+5. **Click** "Load unpacked" and select the extracted folder
+6. **Done!** Click the extension icon to configure
+
+## 🎯 Usage
+
+1. Click the extension icon in your toolbar
+2. Enable the toggle
+3. Select your TOPIK level (I, Ⅱ, or All)
+4. Visit any Korean website!
+
+**Test it on**:
+- [Korean Wikipedia](https://ko.wikipedia.org/wiki/한국어)
+- [Naver News](https://news.naver.com)
+
+## 🐛 Known Limitations
+
+- `가서` (가다 + ㅏ-contraction) produces no annotation — Unicode syllable-block contraction not yet handled
+- Currently only English translations available (Chinese & Japanese coming soon!)
+- Chrome may disable developer mode extensions after browser restart (simply re-enable)
+
+## 🔮 Coming Soon
+
+- Chinese and Japanese translation support
+- User custom vocabulary feature
+- Learning statistics dashboard
+- Audio pronunciation support
+- Export/import word lists
+
+## 📄 Documentation
+
+- **README**: [Project overview and developer guide](https://github.com/leahyums/wordwise_korean#readme)
+- **CHANGELOG**: [Version history](https://github.com/leahyums/wordwise_korean/blob/main/CHANGELOG.md)
+- **Vocabulary Guide**: [Adding custom words](https://github.com/leahyums/wordwise_korean/blob/main/data/README.md)
+
+## 🤝 Contributing
+
+Contributions welcome! See [CONTRIBUTING guidelines](https://github.com/leahyums/wordwise_korean#contributing) in the main README.
+
+## 📜 License
+
+MIT License — Free and open source
+
+---
+
+**Questions or issues?** [Open an issue](https://github.com/leahyums/wordwise_korean/issues)
+
+**Happy learning! 화이팅! 💪**
 
 ### Added Features
 - **🎚️ Font Size Control** - New slider in popup to adjust translation text size

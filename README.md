@@ -7,7 +7,8 @@ A browser extension that adds Kindle Word Wise style annotations for Korean lang
 - **Instant Translations**: Korean vocabulary words are automatically annotated with translations above them
 - **TOPIK Levels**: Filter vocabulary by TOPIK I, TOPIK Ⅱ, or all levels (**6,065 words**)
 - **English Translations**: High-quality English translations (Chinese & Japanese coming soon!)
-- **Smart Matching**: Handles verb/adjective conjugations with stem extraction
+- **Smart Matching**: POS-aware two-pass lookup handles verb/adjective conjugations and correctly resolves noun/verb ambiguity (살/살다, 배우/배우다, 서/서다, 해요/하다)
+- **Clean Translations**: Parenthetical notes, tilde meta-descriptions, and near-synonyms automatically stripped for concise display
 - **Grammar Particle Filtering**: Excludes common particles (은/는/이/가/을/를/etc.) to avoid cluttering text
 - **Dynamic Content**: Works on single-page applications with real-time updates
 - **Visual Highlight**: Optional background highlight for annotated words
@@ -163,11 +164,11 @@ WXT provides instant hot reload - just save your changes and see them immediatel
 
 ### Running Tests
 ```bash
-pnpm test          # Run all 78 tests
+pnpm test          # Run all 109 tests
 pnpm test:watch    # Watch mode during development
 ```
 
-Tests cover translation precision, vocabulary data integrity, and Korean stem matching.
+Tests cover translation precision, vocabulary data integrity, Korean stem matching, and POS-aware collision resolution.
 
 ### Testing on Live Sites
 Test on these Korean websites:
@@ -217,9 +218,10 @@ MIT License - feel free to use this project for learning and development!
 - [x] Expand vocabulary to TOPIK I + II (now 6,065 words)
 - [x] Handle Korean verb/adjective conjugations
 - [x] Filter common grammar particles
-- [x] Translation quality pass (concise, no verbose prefixes)
-- [x] Automated test suite (78 tests)
-- [ ] Fix stem-matching collisions (살/살다, 배우/배우다, 해요/하다) — *next up*
+- [x] Translation quality pass (concise, no verbose prefixes, synonym dedup, tilde-description stripping)
+- [x] Fix stem-matching collisions (살/살다, 배우/배우다, 서/서다, 해요/하다) — POS-aware two-pass lookup
+- [x] Fix digit-compound annotation (1심, 2층, etc.)
+- [x] Automated test suite (109 tests)
 - [ ] Add Chinese and Japanese translation support
 - [ ] Add user custom vocabulary
 - [ ] Statistics dashboard (words learned, pages visited)
