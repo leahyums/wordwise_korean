@@ -1,5 +1,60 @@
 # Development Notes
 
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- pnpm, npm, or yarn
+- Chrome or Edge browser
+
+### Setup
+
+```bash
+pnpm install   # ~1-2 minutes
+pnpm dev       # builds, opens Chrome, loads extension, watches for changes
+```
+
+### Test the Extension
+
+**Option A – Test page (recommended first time)**
+1. Open `test.html` in the browser opened by WXT
+2. Translations should appear above Korean words
+3. Use the "Add Korean Text" button to test dynamic content
+
+**Option B – Real Korean websites**
+- https://ko.wikipedia.org/wiki/한국어
+- https://news.naver.com
+- https://twitter.com (search for 한국어)
+
+### Configure Settings
+
+1. Click the extension icon (puzzle piece) in the browser toolbar
+2. Popup controls:
+   - **Toggle** – enable / disable
+   - **Level** – TOPIK I (~1,600 words), TOPIK Ⅱ (~2,700 words), or All (~4,300 words)
+   - **Language** – English (Chinese & Japanese coming soon)
+   - **Highlight** – show background highlight
+3. Changes apply immediately
+
+### Development Workflow
+
+All TypeScript files live in `src/`. WXT auto-reloads the extension on save.
+
+Key files to edit:
+
+| File | Purpose |
+|------|---------|
+| `src/entrypoints/content.ts` | Main annotation logic |
+| `src/utils/annotator.ts` | Core matching engine |
+| `src/utils/korean-stem.ts` | Conjugation handling |
+| `src/entrypoints/popup/App.vue` | Popup UI |
+| `src/assets/topik-vocab.json` | 6,065-word vocabulary database |
+
+See [scripts/README.md](scripts/README.md) for tools to parse PDFs, convert CSVs, and batch-translate. Source vocab files are in `data/`.
+
+---
+
 ## Architecture Overview
 
 ### Content Script Flow
@@ -288,6 +343,25 @@ See CHANGELOG.md for full details.
 - Vocabulary level includes words?
 - Check processed nodes count
 - Check console for "Loaded X vocabulary words" message
+
+### Issue: Build errors / stale cache
+**Solution**: Clear caches and rebuild:
+```bash
+rm -rf .wxt .output node_modules
+pnpm install
+pnpm dev
+```
+
+### Issue: Port already in use (port 3000)
+**Windows:**
+```bash
+netstat -ano | findstr :3000
+taskkill /PID <PID> /F
+```
+**Mac/Linux:**
+```bash
+lsof -ti:3000 | xargs kill -9
+```
 
 ### Issue: Performance slow
 **Solutions**:
