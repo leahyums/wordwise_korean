@@ -31,8 +31,8 @@ After merging, deduplication, and quality pass: **6,064 words** in `src/assets/t
 | **Total** | **6,064** | **~1,750** | **~240** |
 
 **Next Steps (Optional):**
-- Add accurate Chinese/Japanese translations using `batch-translate.js`
-- Fine-tune verb/adjective conjugation matching
+- ✅ Chinese/Japanese translations via Azure OpenAI batch translation
+- ✅ Verb/adjective conjugation matching
 - Add user custom vocabulary feature
 - Expand further using KRDICT API or additional word lists
 
@@ -40,7 +40,7 @@ After merging, deduplication, and quality pass: **6,064 words** in `src/assets/t
 
 ## 🎨 Customizing Vocabulary
 
-### Method 1: Add/Edit Words Manually
+### Manual Editing
 
 Edit `src/assets/topik-vocab.json` directly:
 
@@ -57,7 +57,7 @@ Edit `src/assets/topik-vocab.json` directly:
 }
 ```
 
-### Method 2: Batch Translate
+### Batch Translation
 
 ```powershell
 # Auto-translate missing zh/ja using Azure OpenAI
@@ -154,14 +154,9 @@ ruby.word-wise-highlight {
 
 ---
 
-## 🌐 Translation Services for Batch Processing
+## 🌐 Batch Translation (Azure OpenAI)
 
-### Free Options:
-- **Google Translate API** (Free tier: 500k chars/month)
-- **ChatGPT/Claude** (Free tier available)
-- **Papago API** (Great for Korean, free tier exists)
-
-### Using the Batch Translation Script:
+### Running the Script:
 
 ```powershell
 # Set your Azure OpenAI key
@@ -230,9 +225,10 @@ These source files are **not** loaded by the extension. They are kept as referen
 
 ## 📜 Sources & Attribution
 
-- **TOPIK I & II Lists**: [Tammy Korean (learning-korean.com)](https://learning-korean.com/)
-- **License**: Educational use - check source website for specific terms
-- **Credit**: Thank you to Tammy Korean for providing free TOPIK vocabulary resources!
+- **TOPIK I word list**: [Tammy Korean — Elementary](https://learning-korean.com/elementary/20210101-10466/)
+- **TOPIK II word list**: [Tammy Korean — Intermediate](https://learning-korean.com/intermediate/20220630-12696/)
+- **TOPIK II extended list**: [koreantopik.com](https://koreantopik.com/) (scraped via `scrape-topik2-3900.py`)
+- **License**: Educational use — check source websites for specific terms
 
 ---
 
@@ -250,10 +246,9 @@ Source files have been deleted; vocabulary is in `src/assets/topik-vocab.json`.
 2. ✅ Supports 30+ common verb/adjective endings
 3. ✅ Fallback matching for edge cases
 
-### Phase 4: Translation Quality (Optional - Future)
-1. Run batch translation for Chinese/Japanese
-2. Manual review and correction
-3. User testing and refinement
+### Phase 4: Translation Quality ✅ COMPLETED
+1. ✅ Batch translation for English, Chinese, and Japanese via Azure OpenAI
+2. ✅ Quality pass — verbose prefixes stripped, synonyms deduped, tilde-descriptions removed
 
 ---
 

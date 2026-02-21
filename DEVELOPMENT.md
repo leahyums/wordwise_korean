@@ -52,6 +52,8 @@
 - [Automation](#automation)
 - [Release Process](#release-process)
 - [Quick Reference](#quick-reference)
+  - [Project Structure](#project-structure)
+  - [Important Files](#important-files)
   - [Important Files](#important-files)
   - [Key Constants](#key-constants)
   - [Useful Commands](#useful-commands)
@@ -85,7 +87,7 @@ pnpm dev       # builds, opens Chrome, loads extension, watches for changes
 1. Click the extension icon (puzzle piece) in the browser toolbar
 2. Popup controls:
    - **Toggle** – enable / disable
-   - **Level** – TOPIK I (1,578 words), TOPIK Ⅱ (4,486 words), or All (6,064 words)
+   - **Level** – TOPIK I, TOPIK Ⅱ, or All (see [data/README.md](data/README.md) for current counts)
    - **Language** – English, 中文 (Simplified Chinese), or 日本語 (Japanese)
    - **Font size** – 80%–150% slider
    - **Highlight** – show background highlight under annotated words
@@ -593,6 +595,45 @@ pnpm zip
 ---
 
 ## Quick Reference
+
+### Project Structure
+
+```
+wordwise_korean/
+├── src/
+│   ├── entrypoints/
+│   │   ├── content.ts           # Two-phase init, styles, config listener
+│   │   ├── background.ts        # Background script
+│   │   └── popup/               # Settings UI (Vue 3)
+│   ├── utils/
+│   │   ├── annotator.ts         # Core annotation engine (POS-aware stem lookup)
+│   │   ├── vocabulary-loader.ts # Load + filter vocab by level
+│   │   ├── korean-stem.ts       # Conjugation stripping, extractStemsForLookup()
+│   │   └── dom-observer.ts      # MutationObserver for dynamic content
+│   ├── assets/
+│   │   └── topik-vocab.json     # Bundled vocabulary database (see data/README.md)
+│   ├── tests/
+│   │   ├── vocab-translations.test.ts
+│   │   └── stem-matching.test.ts
+│   └── types/
+│       └── index.ts             # UserConfig, VocabEntry, STORAGE_KEYS, DEFAULT_CONFIG
+├── scripts/
+│   ├── batch-translate.js       # AI translation tool (Azure OpenAI)
+│   ├── update-vocab-counts.mjs  # Sync word counts in docs/index.html
+│   ├── screenshot.mjs           # Capture landing page screenshots
+│   ├── generate-icons.mjs       # Rebuild extension icon PNGs from icon.svg
+│   ├── validate-docs.mjs        # Pre-commit doc fact checker
+│   └── README.md
+├── git-hooks/
+│   └── pre-commit               # Runs validate-docs.mjs on every commit
+├── data/
+│   └── README.md                # Vocabulary sources & customization guide
+├── docs/                        # GitHub Pages landing page
+├── .github/images/              # README + store screenshots
+├── vitest.config.ts
+├── wxt.config.ts                # Version must match package.json
+└── package.json
+```
 
 ### Important Files
 - `src/entrypoints/content.ts` — two-phase init, styles, config change listener

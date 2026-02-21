@@ -18,20 +18,7 @@ A browser extension that adds Kindle Word Wise style annotations for Korean lang
 - **Any Korean site** — works on SPAs with real-time MutationObserver support
 - **100% local** — no data collection, no external API calls
 
-## 🎯 How It Works
-
-When you visit a Korean website, the extension:
-
-1. Scans the page for Korean text
-2. Matches words against your vocabulary level
-3. Adds ruby tags with translations above words
-4. Watches for new content and annotates it automatically
-
 ## 🚀 Installation
-
-### For Users
-
-**Download the extension:**
 
 1. Get the latest ZIP from [GitHub Releases](https://github.com/multilingual-lab/wordwise_korean/releases/latest)
 2. Open Chrome and go to `chrome://extensions/`
@@ -39,7 +26,21 @@ When you visit a Korean website, the extension:
 4. Drag and drop the ZIP directly onto the page
 5. Click the extension icon and enable it!
 
-### For Developers
+## 📖 Usage
+
+1. Click the extension icon in your browser toolbar
+2. Enable the extension using the toggle
+3. Select your vocabulary level:
+   - **TOPIK I**: Basic vocabulary
+   - **TOPIK Ⅱ**: Intermediate/Advanced
+   - **All**: Complete vocabulary
+4. Select your translation language: **English**, **Chinese**, or **Japanese**
+5. Adjust settings like translation size and highlighting
+6. Visit any Korean website and see translations appear!
+
+## 🔧 For Developers
+
+### Setup
 
 1. **Install dependencies**:
 ```bash
@@ -57,10 +58,23 @@ This will:
 - Open Chrome with the extension loaded
 - Watch for changes and auto-reload
 
-3. **Visit a Korean website** to test:
-- https://ko.wikipedia.org
+### Running Tests
+```bash
+pnpm test          # Run all tests
+pnpm test:watch    # Watch mode during development
+```
+
+Tests cover translation precision, vocabulary data integrity, Korean stem matching, and POS-aware collision resolution.
+
+### Debugging
+- Open extension popup and check console: Right-click → Inspect
+- Content script logs: Open page console (F12)
+- Background script: `chrome://extensions` → Details → Inspect views
+
+Test on live Korean sites:
+- https://ko.wikipedia.org/wiki/한국어
 - https://news.naver.com
-- https://twitter.com (search for Korean content)
+- https://twitter.com/search?q=한국어
 
 ### Building for Production
 
@@ -77,55 +91,7 @@ pnpm zip
 
 Output will be in `.output/` directory.
 
-## 📖 Usage
-
-1. Click the extension icon in your browser toolbar
-2. Enable the extension using the toggle
-3. Select your vocabulary level:
-   - **TOPIK I**: Basic vocabulary
-   - **TOPIK Ⅱ**: Intermediate/Advanced
-   - **All**: Complete vocabulary
-4. Select your translation language: **English**, **Chinese**, or **Japanese**
-5. Adjust settings like translation size and highlighting
-6. Visit any Korean website and see translations appear!
-
-## 🏗️ Project Structure
-
-```
-wordwise_korean/
-├── src/
-│   ├── entrypoints/
-│   │   ├── content.ts           # Main annotation logic
-│   │   ├── background.ts        # Background script
-│   │   └── popup/              # Settings UI
-│   ├── utils/
-│   │   ├── annotator.ts        # Core annotation engine
-│   │   ├── vocabulary-loader.ts # Vocab filtering
-│   │   ├── korean-stem.ts      # Conjugation matching
-│   │   └── dom-observer.ts     # Dynamic content watcher
-│   ├── assets/
-│   │   └── topik-vocab.json    # TOPIK I + II vocabulary (deduplicated)
-│   ├── tests/
-│   │   ├── vocab-translations.test.ts  # Translation precision tests
-│   │   └── stem-matching.test.ts        # Conjugation matching tests
-│   └── types/
-│       └── index.ts            # TypeScript interfaces
-├── scripts/
-│   ├── pdf-to-vocab.js         # Parse PDF text to JSON
-│   ├── csv-to-vocab.js         # Convert CSV to vocab JSON
-│   ├── batch-translate.js      # AI translation tool
-│   └── README.md               # Scripts documentation
-├── data/
-│   ├── README.md               # Vocabulary customization guide
-│   ├── topik-1671-words.txt    # TOPIK I source text
-│   └── topik-2662-words.txt    # TOPIK II source text
-├── public/                     # Static assets
-├── vitest.config.ts           # Test configuration
-├── wxt.config.ts              # WXT configuration
-└── package.json
-```
-
-## 🛠️ Tech Stack
+## ️ Tech Stack
 
 - **Framework**: [WXT](https://wxt.dev/) - Modern extension development
 - **UI**: Vue 3 + TypeScript
@@ -153,29 +119,16 @@ wordwise_korean/
 - The extension uses debouncing (500ms) for dynamic content
 - Some sites with heavy dynamic updates may experience slight delays
 
-## 📝 Development Tips
+## 🗺️ Roadmap
 
-### Hot Reload
-WXT provides instant hot reload - just save your changes and see them immediately!
-
-### Running Tests
-```bash
-pnpm test          # Run all 109 tests
-pnpm test:watch    # Watch mode during development
-```
-
-Tests cover translation precision, vocabulary data integrity, Korean stem matching, and POS-aware collision resolution.
-
-### Testing on Live Sites
-Test on these Korean websites:
-- https://ko.wikipedia.org/wiki/한국어
-- https://news.naver.com
-- https://twitter.com/search?q=한국어
-
-### Debugging
-- Open extension popup and check console: Right-click → Inspect
-- Content script logs: Open page console (F12)
-- Background script: `chrome://extensions` → Details → Inspect views
+- [x] Expand vocabulary to TOPIK I + II
+- [x] Handle Korean verb/adjective conjugations
+- [x] Filter common grammar particles
+- [x] Translation quality pass (concise, no verbose prefixes, synonym dedup, tilde-description stripping)
+- [x] Fix stem-matching collisions (살/살다, 배우/배우다, 서/서다, 해요/하다) — POS-aware two-pass lookup
+- [x] Fix digit-compound annotation (1심, 2층, etc.)
+- [x] Add Chinese and Japanese translations via Azure OpenAI batch translation
+- [ ] Add more vocabulary
 
 ## 🤝 Contributing
 
@@ -190,14 +143,10 @@ Contributions welcome! Please:
 ### Adding Vocabulary
 
 Want to expand or customize the vocabulary? See [data/README.md](data/README.md) for:
-- How to add words from CSV or PDF files
-- Batch translation guide
-- Styling customization
+- Original vocabulary sources
+- How to re-scrape and merge new words
+- Batch translation guide (Azure OpenAI)
 - Quality control checklist
-
-Priority areas:
-- Add Chinese and Japanese translation support
-- Expand vocabulary coverage within existing levels
 
 ## 📄 License
 
@@ -208,22 +157,6 @@ MIT License - feel free to use this project for learning and development!
 - Inspired by [Furigana Maker](https://github.com/aiktb/furiganamaker) for Japanese learning
 - Built with [WXT](https://wxt.dev/) - amazing extension framework
 - Korean vocabulary based on TOPIK standards
-
-## 🎯 Roadmap
-
-- [x] Expand vocabulary to TOPIK I + II
-- [x] Handle Korean verb/adjective conjugations
-- [x] Filter common grammar particles
-- [x] Translation quality pass (concise, no verbose prefixes, synonym dedup, tilde-description stripping)
-- [x] Fix stem-matching collisions (살/살다, 배우/배우다, 서/서다, 해요/하다) — POS-aware two-pass lookup
-- [x] Fix digit-compound annotation (1심, 2층, etc.)
-- [x] Automated test suite (109 tests)
-- [ ] Add Chinese and Japanese translation support
-- [ ] Add user custom vocabulary
-- [ ] Statistics dashboard (words learned, pages visited)
-- [ ] Export/import vocabulary lists
-- [ ] Pronunciation audio support
-- [ ] Spaced repetition learning features
 
 ---
 

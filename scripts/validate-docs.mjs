@@ -84,8 +84,8 @@ if (dataReadme.includes(formattedCount)) {
 
 // Also check DEVELOPMENT.md if it mentions a total word count
 const devMd = fs.readFileSync(path.join(root, 'DEVELOPMENT.md'), 'utf8');
-// Only flag patterns that look like total counts: "X total words" or "X words (after"
-const devTotalMatches = [...devMd.matchAll(/(\d[\d,]+)\s*(?:total\s+)?words?\s*(?:\(after|total)/gi)];
+// Flag patterns that look like total counts: "X total words", "words (after", or "(X,XXX words)"
+const devTotalMatches = [...devMd.matchAll(/(\d[\d,]+)\s*(?:total\s+)?words?(?:\s*\(after|\s+total|\))/gi)];
 for (const m of devTotalMatches) {
   const raw = m[1].replace(/,/g, '');
   const n = parseInt(raw, 10);
