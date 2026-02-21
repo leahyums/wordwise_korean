@@ -581,16 +581,27 @@ git push origin main
 git push origin vX.Y.Z
 ```
 
-**6. Build ZIP**
+**6. Build ZIPs**
 ```bash
-pnpm zip
-# Output: .output/wordwise-korean-X.Y.Z-chrome.zip
+pnpm zip:all
+# Outputs:
+#   .output/wordwise-korean-X.Y.Z-chromium.zip  ← Chrome, Edge, Brave, Opera, Vivaldi
+#   .output/wordwise-korean-X.Y.Z-firefox.zip   ← Firefox (MV2)
+#   .output/wordwise-korean-X.Y.Z-sources.zip   ← Firefox AMO reviewer requirement
+
+# Or build individually:
+pnpm zip          # Chromium only
+pnpm zip:firefox  # Firefox + sources
 ```
+
+> **Note:** `sources.zip` is required by Firefox AMO (Mozilla's add-on store). Upload it as
+> "source code" in the AMO submission form so reviewers can build the extension themselves.
+> It is not needed for the Chrome Web Store.
 
 **7. Create GitHub Release**
 - Go to `https://github.com/multilingual-lab/wordwise_korean/releases/new?tag=vX.Y.Z`
 - Paste CHANGELOG entries as release notes
-- Attach `.output/wordwise-korean-X.Y.Z-chrome.zip`
+- Attach `.output/wordwise-korean-X.Y.Z-chromium.zip` and `.output/wordwise-korean-X.Y.Z-firefox.zip`
 
 ---
 
@@ -657,7 +668,9 @@ pnpm build         # Production build
 pnpm compile       # Type check only
 pnpm test          # Run automated test suite
 pnpm test:watch    # Tests in watch mode
-pnpm zip           # Create distributable ZIP
+pnpm zip           # Build Chromium ZIP (.output/...-chromium.zip)
+pnpm zip:firefox   # Build Firefox ZIP + sources.zip (required by Firefox AMO)
+pnpm zip:all       # Build both Chromium and Firefox ZIPs
 pnpm update-counts # Sync vocab counts in docs/index.html from JSON
 pnpm screenshot    # Regenerate store + README screenshots
 pnpm generate-icons # Rebuild icon PNGs from icon.svg
