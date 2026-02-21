@@ -1,283 +1,160 @@
-# Vocabulary Management Scripts
+﻿# Scripts
 
-This directory contains tools for managing and expanding the TOPIK vocabulary.
+Tools for managing, expanding, and maintaining the TOPIK vocabulary and project assets.
 
-## Available Scripts
+## Quick Reference
 
-### 1. `csv-to-vocab.js` - Convert CSV to Vocabulary JSON
+| Script | Command | Purpose |
+|---|---|---|
+| `batch-translate.js` | `node scripts/batch-translate.js` | Translate all missing zh/ja via Azure OpenAI |
+| `update-vocab-counts.mjs` | `pnpm update-counts` | Patch word counts in `docs/index.html` |
+| `screenshot.mjs` | `pnpm screenshot` | Capture landing page PNGs for README + store |
+| `generate-icons.mjs` | `pnpm generate-icons` | Rebuild extension icon PNGs from `icon.svg` |
+| `improve-translations.py` | `python scripts/improve-translations.py` | Clean up verbose/noisy translations |
+| `merge-topik2-vocab.py` | `python scripts/merge-topik2-vocab.py` | Merge scraped TOPIK II words into main vocab |
+| `scrape-topik2-3900.py` | `python scripts/scrape-topik2-3900.py` | Scrape TOPIK II 3,900-word list from web |
 
-Converts CSV files to the vocabulary JSON format used by the extension.
+---
 
-**Usage:**
-```bash
-node scripts/csv-to-vocab.js <csv-file> [options]
+## Script Details
 
-Options:
-  --merge           Merge with existing vocabulary (no duplicates)
-  --output <file>   Custom output filename
+### `batch-translate.js` — Batch translate via Azure OpenAI
+
+Translates all entries in `topik-vocab.json` that have missing or placeholder `zh`/`ja` fields. Outputs to a separate file so you can review before overwriting.
+
+**Requires:** `AZURE_OPENAI_KEY` environment variable (Azure OpenAI, not standard OpenAI).  
+The endpoint is hardcoded to the lab Azure deployment (`lab-oai-ext-je.openai.azure.com`, gpt-4o-mini).
+
+```powershell
+# Windows
+$env:AZURE_OPENAI_KEY="<your-key>"
+node scripts/batch-translate.js
 ```
 
-**Examples:**
-```bash
-# Convert standalone file
-node scripts/csv-to-vocab.js topik1.csv
+**Input:** `src/assets/topik-vocab.json`  
+**Output:** `src/assets/topik-vocab-translated.json` (never overwrites the original directly)
 
-# Merge with existing vocabulary
-node scripts/csv-to-vocab.js topik1.csv --merge
-
-# Custom output name
-node scripts/csv-to-vocab.js topik1.csv --output my-vocab.json
-```
-
-**CSV Format:**
-```csv
-word,level,pos,en,zh,ja
-안녕하세요,1,expression,Hello,你好,こんにちは
-```
-
-**Minimum format** (will need translation later):
-```csv
-word,level,en
-안녕하세요,1,Hello
+Review the output, then replace:
+```powershell
+Move-Item src/assets/topik-vocab-translated.json src/assets/topik-vocab.json -Force
 ```
 
 ---
 
-### 2. `batch-translate.js` - Auto-translate Missing Languages
+### `update-vocab-counts.mjs` — Sync word counts in landing page
 
-Uses ChatGPT API to fill in missing Chinese/Japanese translations.
+Reads `src/assets/topik-vocab.json` and patches the word-count numbers displayed in `docs/index.html`.
 
-**Setup:**
 ```bash
-# Get API key from https://platform.openai.com/api-keys
-# Windows:
-$env:OPENAI_API_KEY="sk-..."
-
-# Mac/Linux:
-export OPENAI_API_KEY="sk-..."
+pnpm update-counts
 ```
 
-**Usage:**
-```bash
-node scripts/batch-translate.js [vocab-file] [options]
-
-Options:
-  --langs zh,ja    Languages to translate (default: zh,ja)
-  --batch 20       Batch size (default: 20)
-```
-
-**Examples:**
-```bash
-# Translate current vocabulary
-node scripts/batch-translate.js src/assets/topik-vocab.json
-
-# Only translate to Chinese
-node scripts/batch-translate.js src/assets/topik-vocab.json --langs zh
-
-# Smaller batches (if hitting rate limits)
-node scripts/batch-translate.js src/assets/topik-vocab.json --batch 10
-```
-
-**Cost estimate:** ~$0.10-0.50 for 800 words using gpt-4o-mini
+Run this after any change to `topik-vocab.json` that adds or removes entries.
 
 ---
 
-### 3. `pdf-to-vocab.js` - Parse PDF Text Extracts
+### `screenshot.mjs` — Capture landing page screenshots
 
-Parses vocabulary from text extracted from TOPIK vocabulary PDFs.
+Uses headless Puppeteer to capture two PNG screenshots of `docs/index.html`:
 
-**Usage:**
+| Output | Size | Use |
+|---|---|---|
+| `.github/images/landingpage-1280x800.png` | 1280×800 | Chrome Web Store marquee image |
+| `.github/images/landingpage.png` | 1280×700 | README hero image (nav hidden) |
+
 ```bash
-node scripts/pdf-to-vocab.js <text-file> [options]
-
-Options:
-  --level N     Set TOPIK level (1 for TOPIK I, 2 for TOPIK Ⅱ)
-  --merge       Merge with existing vocabulary
+pnpm screenshot
 ```
 
-**Examples:**
-```bash
-# Parse TOPIK I vocabulary
-node scripts/pdf-to-vocab.js data/topik-1671-words.txt --level 1
-
-# Parse TOPIK II and merge with TOPIK I
-node scripts/pdf-to-vocab.js data/topik-2662-words.txt --level 2 --merge
-```
-
-**How to extract text from PDF:**
-1. Open PDF in browser or PDF reader
-2. Press Ctrl+A (Select All)
-3. Press Ctrl+C (Copy)
-4. Paste into a text file, save as UTF-8
-5. Save in `data/` folder
-6. Run the parser
-
-**Supported format:** Handles columnar "No. 한글 English" format from learning-korean.com PDFs.
-
-**Source files:** Already included in `data/` folder:
-- `data/topik-1671-words.txt` - TOPIK I vocabulary
-- `data/topik-2662-words.txt` - TOPIK II vocabulary
+Run this after any visual change to `docs/index.html`.
 
 ---
 
-### 4. `scrape-topik2-3900.py` - Scrape Extended TOPIK II Vocabulary
+### `generate-icons.mjs` — Rebuild extension icon PNGs
 
-Fetches the TOPIK II 3,900-word vocabulary from koreantopik.com and generates a JSON file.
+Generates the required chrome extension icon sizes (16, 32, 48, 96, 128 px) from `src/public/icon/icon.svg`.
 
-**Usage:**
+```bash
+pnpm generate-icons
+```
+
+Run this after editing `icon.svg`.
+
+---
+
+### `improve-translations.py` — Clean up translation quality
+
+Runs two cleanup passes on every entry in `topik-vocab.json`:
+
+1. **Simplify** — keeps only the first/clearest term from comma-separated lists.  
+   e.g. `"simple, easy"` → `"simple"`
+2. **Shorten** — replaces lengthy descriptive strings with concise equivalents.  
+   e.g. `"baked bread with red beans inside (street food)"` → `"fish-shaped pastry"`
+
+Already applied to the current `topik-vocab.json`. Re-run after adding or merging new vocabulary.
+
+```bash
+python scripts/improve-translations.py
+```
+
+---
+
+### `merge-topik2-vocab.py` — Merge scraped TOPIK II words
+
+Merges `src/assets/topik2-3900-vocab.json` (scraped TOPIK II words) into `src/assets/topik-vocab.json`, deduplicating by Korean word.
+
+```bash
+python scripts/merge-topik2-vocab.py
+```
+
+Already applied — current `topik-vocab.json` is the merged and quality-audited result (~6,064 words).
+
+---
+
+### `scrape-topik2-3900.py` — Scrape extended TOPIK II list
+
+Fetches the TOPIK II 3,900-word vocabulary from koreantopik.com.
+
 ```bash
 python scripts/scrape-topik2-3900.py
 ```
 
 **Output:** `src/assets/topik2-3900-vocab.json`
 
-**Note:** Requires network access to koreantopik.com. This script was already run — output is integrated into `topik-vocab.json`. Re-run only if you want to refresh the source data.
+Already run — output is integrated into `topik-vocab.json`. Re-run only to refresh source data.
 
 ---
 
-### 5. `improve-translations.py` - Improve Translation Quality
+## Adding New Vocabulary — Full Workflow
 
-Single script that runs two cleanup passes on every entry in `topik-vocab.json`:
+```powershell
+# 1. Translate missing zh/ja
+$env:AZURE_OPENAI_KEY="<your-key>"
+node scripts/batch-translate.js
 
-**Pass 1 – Simplify verbose comma-separated translations**
-- Keeps only the first/clearest term: `"simple, easy"` → `"simple"`
-- Drops Korean romanization prefixes: `"Kochujang, red pepper paste"` → `"red pepper paste"`
-- Applies word-level overrides for sentence-style phrases and ambiguous entries
+# 2. Review topik-vocab-translated.json, then replace
+Move-Item src/assets/topik-vocab-translated.json src/assets/topik-vocab.json -Force
 
-**Pass 2 – Shorten long translations**
-- Replaces lengthy descriptive strings with concise idiomatic equivalents
-- e.g. `"baked bread with red beans inside (street food)"` → `"fish-shaped pastry"`
-- e.g. `"the day of the year to eat nourishing food"` → `"hottest dog-day"`
-
-Both passes also mirror results to `zh`/`ja` fields that hold English placeholder text.
-
-**Usage:**
-```bash
+# 3. Clean up translations (optional)
 python scripts/improve-translations.py
-```
 
-**Note:** Already applied to the current `topik-vocab.json`. Re-run after adding or merging new vocabulary.
+# 4. Sync landing page counts
+pnpm update-counts
 
----
-
-### 6. `merge-topik2-vocab.py` - Merge Scraped TOPIK II Vocabulary
-
-Merges `src/assets/topik2-3900-vocab.json` (scraped TOPIK II words) into `src/assets/topik-vocab.json`, deduplicating by Korean word.
-
-**Usage:**
-```bash
-python scripts/merge-topik2-vocab.py
-```
-
-**Result:** Updates `src/assets/topik-vocab.json` in-place. After running both scripts the vocabulary grows to ~6,064 words (1,578 TOPIK I + 4,486 TOPIK II, after deduplication and quality pass).
-
-**Note:** Already applied — current `topik-vocab.json` reflects the merged and quality-audited result.
-
----
-
-## Complete Workflow Example
-
-### Starting from a CSV file:
-
-```bash
-# 1. Convert CSV to JSON (outputs src/assets/topik-vocab-imported.json)
-node scripts/csv-to-vocab.js my-topik-words.csv --merge
-
-# 2. Translate missing languages (Chinese/Japanese)
-$env:OPENAI_API_KEY="sk-..."
-node scripts/batch-translate.js src/assets/topik-vocab-imported.json
-
-# 3. Review and apply
-# Check the output file first
-Get-Content src/assets/topik-vocab-imported.json | Select-Object -First 20
-
-# If good, merge into main vocab:
-node scripts/csv-to-vocab.js my-topik-words.csv --merge --output topik-vocab.json
-
-# 4. Run tests to verify data integrity
+# 5. Verify
 pnpm test
-
-# 5. Rebuild extension
-pnpm dev
-```
-
-### Real-world example:
-
-```bash
-# Download TOPIK vocabulary PDFs from learning-korean.com
-# Extract text to files, then:
-
-# Parse TOPIK I
-node scripts/pdf-to-vocab.js topik-1671-words.txt --level 1
-
-# Parse TOPIK II and merge
-node scripts/pdf-to-vocab.js topik-2662-words.txt --level 2 --merge
-
-# Apply the merged vocabulary
-Move-Item src/assets/topik-vocab-from-pdf.json src/assets/topik-vocab.json -Force
-
-# Result: merged into topik-vocab.json (~6,064 words)
 ```
 
 ---
 
 ## Troubleshooting
 
-### CSV Encoding Issues
-Make sure your CSV is UTF-8 encoded:
+### Verify vocab integrity
 ```bash
-# Windows PowerShell - convert to UTF-8
-Get-Content input.csv | Set-Content -Encoding UTF8 output.csv
-
-# Or use a text editor:
-# - VS Code: "Save with Encoding" → UTF-8
-# - Notepad++: Encoding → Convert to UTF-8
+node -e "const v=JSON.parse(require('fs').readFileSync('src/assets/topik-vocab.json')); const u=new Set(v.map(w=>w.word)); console.log('Total:', v.length, 'Unique:', u.size)"
 ```
 
-### API Rate Limits
-If you hit rate limits with OpenAI:
-- Reduce batch size: `--batch 10`
-- Add delays in the script (already has 1s between batches)
-- Use a different API key tier
-
-### Verification
-Check vocabulary loaded correctly:
-```bash
-# Count words
-node -e "console.log(require('./src/assets/topik-vocab.json').length)"
-
-# Check for duplicates
-node -e "const v=require('./src/assets/topik-vocab.json'); console.log('Total:', v.length, 'Unique:', new Set(v.map(w=>w.word)).size)"
-```
-
----
-
-## Tips
-
-**Where to find TOPIK word lists:**
-- https://www.topikguide.com/ (Excel/CSV downloads)
-- https://talktomeinkorean.com/curriculum/
-- https://quizlet.com/ (search "TOPIK", export to CSV)
-- Anki decks (export as CSV)
-
-**CSV Format Tips:**
-- Always include header row
-- Use UTF-8 encoding
-- Quote fields containing commas: `"hello, world"`
-- Keep it simple: just `word,level,en` is enough!
-
-**Cost Optimization:**
-- Use gpt-4o-mini (current default) - 10x cheaper than gpt-4
-- Batch size 20-50 words optimal
-- ~1,600 words costs $0.40-$1.00
-- ~4,300 words costs $1.00-$2.50
-- Chinese/Japanese together in one API call
-
-**Quality Control:**
-- Manually review AI translations for cultural accuracy
-- Check verb/adjective dictionary forms end in 다
-- Verify TOPIK level assignments
-- Test on real Korean content
+See [data/README.md](../data/README.md) for vocabulary data sources.
 
 ---
 
