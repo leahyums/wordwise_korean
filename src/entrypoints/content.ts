@@ -5,13 +5,52 @@ import { loadVocabulary } from '@/utils/vocabulary-loader';
 import { WordWiseAnnotator } from '@/utils/annotator';
 import { DOMObserver } from '@/utils/dom-observer';
 
+const KOREAN_RE = /[가-힣]/;
+
 export default defineContentScript({
   matches: ['<all_urls>'],
   registration: 'manifest',
-  
+
   async main() {
+    // Phase 1: fast Korean-presence check.
+    // If the page already has Korean, go straight to full init.
+    // Otherwise, watch for Korean to appear (SPAs, lazy-loaded content)
+    // and only then pay the cost of loading vocabulary + annotator.
+    if (KOREAN_RE.test(document.body.innerText)) {
+      await initializeFull();
+    } else {
+      const sentinel = new MutationObserver((mutations, obs) => {
+        for (const mutation of mutations) {
+          // Check only the newly added/changed text — not the whole body
+          const text =
+            mutation.type === 'characterData'
+              ? (mutation.target.textContent ?? '')
+              : Array.from(mutation.addedNodes)
+                  .map(n => n.textContent ?? '')
+                  .join('');
+          if (KOREAN_RE.test(text)) {
+            obs.disconnect();
+            initializeFull();
+            return;
+          }
+        }
+      });
+      sentinel.observe(document.body, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+    }
+  },
+});
+
+/**
+ * Full initialization — loads vocabulary, creates annotator, starts observer.
+ * Only called once Korean text has been confirmed present on the page.
+ */
+async function initializeFull(): Promise<void> {
     console.log('========================================');
-    console.log('WordWise Korean v0.1.2 - Stem Collision Fix');
+    console.log('WordWise Korean v0.1.3');
     console.log('========================================');
 
     // Load user configuration from storage
@@ -54,8 +93,6 @@ export default defineContentScript({
         console.log('  Highlight:', oldConfig.showHighlight, '→', newConfig.showHighlight);
         console.log('========================================');
 
-        // DON'T update annotator config yet - we need to check what changed first
-
         // If enabled state changed
         if (newConfig.enabled !== oldConfig.enabled) {
           if (newConfig.enabled) {
@@ -92,36 +129,22 @@ export default defineContentScript({
             newConfig.targetLanguage !== oldConfig.targetLanguage ||
             newConfig.showHighlight !== oldConfig.showHighlight
           ) {
-            // Set updating flag to prevent observer interference
             annotator.setUpdating(true);
-            
-            // Stop observer to prevent interference
             observer.stop();
             
-            // Small delay to ensure observer is fully stopped
             setTimeout(() => {
-              // Load new vocabulary (only needed if level changed)
               if (newConfig.level !== oldConfig.level) {
                 const newVocabulary = loadVocabulary(newConfig);
                 console.log(`WordWise Korean: Loaded ${newVocabulary.size} words for Level ${newConfig.level}`);
                 annotator.updateVocabulary(newVocabulary);
               }
               
-              // NOW update the annotator config (after vocabulary is updated)
               annotator.updateConfig(newConfig);
-              
-              // Clear old annotations
               annotator.clearAnnotations();
               
-              // Small delay before re-annotating
               setTimeout(() => {
-                // Re-enable processing
                 annotator.setUpdating(false);
-                
-                // Re-process page
                 annotator.processNode(document.body);
-                
-                // Restart observer
                 observer.start();
               }, 100);
             }, 100);
@@ -133,8 +156,7 @@ export default defineContentScript({
     });
 
     console.log('WordWise Korean: Ready');
-  }
-});
+}
 
 /**
  * Inject CSS styles for ruby tags and annotations
