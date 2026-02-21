@@ -17,12 +17,7 @@ pnpm dev       # builds, opens Chrome, loads extension, watches for changes
 
 ### Test the Extension
 
-**Option A – Test page (recommended first time)**
-1. Open `test.html` in the browser opened by WXT
-2. Translations should appear above Korean words
-3. Use the "Add Korean Text" button to test dynamic content
-
-**Option B – Real Korean websites**
+**On a real Korean website**
 - https://ko.wikipedia.org/wiki/한국어
 - https://news.naver.com
 - https://twitter.com (search for 한국어)
@@ -32,9 +27,10 @@ pnpm dev       # builds, opens Chrome, loads extension, watches for changes
 1. Click the extension icon (puzzle piece) in the browser toolbar
 2. Popup controls:
    - **Toggle** – enable / disable
-   - **Level** – TOPIK I (~1,600 words), TOPIK Ⅱ (~2,700 words), or All (~4,300 words)
-   - **Language** – English (Chinese & Japanese coming soon)
-   - **Highlight** – show background highlight
+   - **Level** – TOPIK I (1,578 words), TOPIK Ⅱ (4,486 words), or All (6,064 words)
+   - **Language** – English, 中文 (Simplified Chinese), or 日本語 (Japanese)
+   - **Font size** – 80%–150% slider
+   - **Highlight** – show background highlight under annotated words
 3. Changes apply immediately
 
 ### Development Workflow
@@ -90,13 +86,12 @@ Listen for config changes
 ### Ruby Tag Structure
 
 ```html
-<ruby class="word-wise-korean word-wise-highlight">
-  <rt>translation</rt>
-  한국어
-</ruby>
+<ruby class="word-wise-korean">한국어<rt>Korean language</rt></ruby>
+<!-- with highlight enabled: -->
+<ruby class="word-wise-korean word-wise-highlight">한국어<rt>Korean language</rt></ruby>
 ```
 
-CSS positions `<rt>` above base text automatically.
+The Korean base text comes **first**, the `<rt>` annotation comes **after** it inside the ruby element. CSS positions `<rt>` above the base text automatically via `ruby-position: over`.
 
 ## Performance Considerations
 
@@ -172,24 +167,25 @@ CSS positions `<rt>` above base text automatically.
 
 ```typescript
 interface VocabEntry {
-  word: string;              // Korean word
-  level: 1 | 2;             // TOPIK level (1=I, 2=II)
+  word: string;              // Korean word (dictionary form)
+  level: 1 | 2;             // TOPIK level (1=I, 2=II) — must be integer
+  pos: string;              // Part of speech: "noun", "verb", "adjective", etc.
   translations: {
-    en: string;
-    zh: string;              // Placeholder (can use batch-translate.js)
-    ja: string;              // Placeholder (can use batch-translate.js)
+    en: string;              // English
+    zh: string;              // Simplified Chinese
+    ja: string;              // Japanese
   };
-  pos?: string;             // Part of speech (optional)
 }
 ```
 
-**Current Stats:**
+**Current Stats (v0.1.3):**
+- Total: **6,064 words** — TOPIK I: 1,578 · TOPIK II: 4,486
 - Grammar particles excluded: 20 common particles (은/는/이/가/을/를/의/도/와/과/etc.)
-- Translations: English only (Chinese & Japanese are placeholders)
-- All translations free of verbose `to /being /to be ` prefixes (stripped 2026-02-20)
-- Translation display: parentheticals stripped, tilde meta-descriptions removed, near-synonyms deduplicated
+- All three languages fully translated (EN / 中文 / 日本語)
+- English translations: parentheticals stripped, tilde meta-descriptions removed, near-synonyms deduplicated, verbose `to/being/to be` prefixes removed
+- `pos` field populated on all entries — required for POS-aware verb/noun disambiguation
 
-**File Size:** ~1 MB (uncompressed JSON), ~630 KB after Vite bundling into content script
+**File Size:** ~1.5 MB (uncompressed JSON), ~1 MB after Vite bundling into content script
 
 ## CSS Tips
 
@@ -304,7 +300,7 @@ All other previously-known collisions (살/살다, 배우/배우다, 서/서다,
 **Fixed**: Noun/verb collisions: `살`/`살다`, `배우`/`배우다`, `서`/`서다`, `해요`/`하다`
 **Fixed**: Digit-compound annotation (1심, 2층 etc.) with digit guard
 **Fixed**: Level-switch crash: `oldConfig ?? DEFAULT_CONFIG`
-**Added**: Merged extended TOPIK II word list → 6,065 total words
+**Added**: Merged extended TOPIK II word list → 6,064 total words
 **Fixed**: 277 duplicate entries, 260 verbose prefixes, 1,283 translation conflicts
 **Added**: Vitest test suite — 78 → 109 tests
 
