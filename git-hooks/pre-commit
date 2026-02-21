@@ -1,0 +1,6 @@
+#!/bin/sh
+# Pre-commit hook: validate documentation facts before every commit.
+# Installed by: git-hooks/install.mjs (or manually: cp .git/hooks/pre-commit)
+
+node scripts/validate-docs.mjs
+exit $?

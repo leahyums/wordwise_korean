@@ -14,13 +14,13 @@ The raw source files have been processed and deleted. The vocabulary is fully co
 | [TOPIK II — Tammy Korean](https://learning-korean.com/intermediate/20220630-12696/) | 2,662 | PDF word list |
 | [koreantopik.com](https://koreantopik.com/) | ~3,900 | Scraped via `scrape-topik2-3900.py` |
 
-After merging, deduplication, and quality pass: **6,065 words** in `src/assets/topik-vocab.json`.
+After merging, deduplication, and quality pass: **6,064 words** in `src/assets/topik-vocab.json`.
 
 ---
 
 ## 📊 Current Status
 
-**✅ Completed: 6,065 words (after deduplication and quality pass)**
+**✅ Completed: 6,064 words (after deduplication and quality pass)**
 - TOPIK I (Level 1): 1,578 words
 - TOPIK Ⅱ (Level 2): 4,487 words
 
@@ -28,7 +28,7 @@ After merging, deduplication, and quality pass: **6,065 words** in `src/assets/t
 |-------|-------|------------------------|-------------|
 | TOPIK I | 1,578 | ~400 | ~50 |
 | TOPIK Ⅱ | 4,487 | ~1,350 | ~190 |
-| **Total** | **6,065** | **~1,750** | **~240** |
+| **Total** | **6,064** | **~1,750** | **~240** |
 
 **Next Steps (Optional):**
 - Add accurate Chinese/Japanese translations using `batch-translate.js`
@@ -241,7 +241,7 @@ These source files are **not** loaded by the extension. They are kept as referen
 ### Phase 1–2.5: Vocabulary Build ✅ COMPLETED
 1. ✅ TOPIK I (Tammy Korean PDF) — 1,668 words
 2. ✅ TOPIK II (Tammy Korean PDF) — merged to 4,341 words
-3. ✅ TOPIK II extended (koreantopik.com scrape) — deduplicated + quality pass → **6,065 total words**
+3. ✅ TOPIK II extended (koreantopik.com scrape) — deduplicated + quality pass → **6,064 total words**
 
 Source files have been deleted; vocabulary is in `src/assets/topik-vocab.json`.
 

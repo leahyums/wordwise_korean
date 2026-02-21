@@ -10,6 +10,7 @@ Tools for managing, expanding, and maintaining the TOPIK vocabulary and project 
 | `update-vocab-counts.mjs` | `pnpm update-counts` | Patch word counts in `docs/index.html` |
 | `screenshot.mjs` | `pnpm screenshot` | Capture landing page PNGs for README + store |
 | `generate-icons.mjs` | `pnpm generate-icons` | Rebuild extension icon PNGs from `icon.svg` |
+| `validate-docs.mjs` | `pnpm validate-docs` | Check docs match reality (version, scripts, word count) |
 | `improve-translations.py` | `python scripts/improve-translations.py` | Clean up verbose/noisy translations |
 | `merge-topik2-vocab.py` | `python scripts/merge-topik2-vocab.py` | Merge scraped TOPIK II words into main vocab |
 | `scrape-topik2-3900.py` | `python scripts/scrape-topik2-3900.py` | Scrape TOPIK II 3,900-word list from web |
@@ -79,6 +80,23 @@ pnpm generate-icons
 ```
 
 Run this after editing `icon.svg`.
+
+---
+
+### `validate-docs.mjs` — Check docs match reality
+
+Runs on every `git commit` automatically (via `git-hooks/pre-commit`). Also runnable manually.
+
+```bash
+pnpm validate-docs
+```
+
+**Checks:**
+1. `package.json` version matches `wxt.config.ts` version
+2. Every script listed in `scripts/README.md` Quick Reference exists on disk
+3. The word count in `data/README.md` matches the actual length of `topik-vocab.json`
+
+Exits with code 1 on any failure, blocking the commit.
 
 ---
 

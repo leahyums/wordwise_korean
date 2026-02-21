@@ -17,6 +17,7 @@
     "generate-icons": "node scripts/generate-icons.mjs",
     "screenshot": "node scripts/screenshot.mjs",
     "compile": "tsc --noEmit",
+    "validate-docs": "node scripts/validate-docs.mjs",
     "postinstall": "wxt prepare"
   },
   "dependencies": {
