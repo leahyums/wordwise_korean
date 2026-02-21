@@ -6,23 +6,19 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * Batch translate missing vocabulary using ChatGPT API
- * Requires OPENAI_API_KEY environment variable
+ * Batch translate missing vocabulary using Azure OpenAI (gpt-4o-mini)
+ * Requires AZURE_OPENAI_KEY environment variable
  */
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const AZURE_OPENAI_ENDPOINT = 'https://lab-oai-ext-je.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2025-01-01-preview';
+const AZURE_OPENAI_KEY = process.env.AZURE_OPENAI_KEY;
 
-if (!OPENAI_API_KEY) {
-  console.error('❌ Error: OPENAI_API_KEY environment variable not set');
+if (!AZURE_OPENAI_KEY) {
+  console.error('❌ Error: AZURE_OPENAI_KEY environment variable not set');
   console.log('');
-  console.log('To use this script:');
-  console.log('  1. Get API key from https://platform.openai.com/api-keys');
-  console.log('  2. Set environment variable:');
-  console.log('     Windows: $env:OPENAI_API_KEY="sk-..."');
-  console.log('     Mac/Linux: export OPENAI_API_KEY="sk-..."');
-  console.log('  3. Run this script again');
-  console.log('');
-  console.log('Alternative: Use --mock flag for testing without API');
+  console.log('Set it with:');
+  console.log('  $env:AZURE_OPENAI_KEY="<your-key>"');
+  console.log('Then run: node scripts/batch-translate.js');
   process.exit(1);
 }
 
@@ -41,14 +37,13 @@ Example output format:
 ["translation1", "translation2", "translation3"]`;
 
   try {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch(AZURE_OPENAI_ENDPOINT, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'api-key': AZURE_OPENAI_KEY,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini', // Cheaper and faster than gpt-4
         messages: [
           {
             role: 'system',
@@ -59,7 +54,7 @@ Example output format:
             content: prompt
           }
         ],
-        temperature: 0.3, // Lower temperature for more consistent translations
+        temperature: 0.3,
       }),
     });
 
@@ -158,10 +153,10 @@ if (process.argv.includes('--help')) {
   console.log('  --help           Show this help');
   console.log('');
   console.log('Environment:');
-  console.log('  OPENAI_API_KEY   Your OpenAI API key (required)');
+  console.log('  AZURE_OPENAI_KEY   Your Azure OpenAI key (required)');
   console.log('');
   console.log('Example:');
-  console.log('  $env:OPENAI_API_KEY="sk-..."');
+  console.log('  $env:AZURE_OPENAI_KEY="<your-key>"');
   console.log('  node scripts/batch-translate.js src/assets/topik-vocab.json');
   process.exit(0);
 }
