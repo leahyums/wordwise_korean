@@ -49,12 +49,12 @@
   - [3. Demo iframe language switcher](#3-demo-iframe-language-switcher--postmessage-protocol)
   - [4. Popup word counts](#4-popup-word-counts--dynamic-derivation-from-json)
   - [5. Vocab JSON schema](#5-vocab-json-schema)
+- [Automation](#automation)
 - [Release Process](#release-process)
 - [Quick Reference](#quick-reference)
   - [Important Files](#important-files)
   - [Key Constants](#key-constants)
   - [Useful Commands](#useful-commands)
-  - [Screenshots](#screenshots)
 
 ---
 
@@ -432,8 +432,7 @@ All 6,064 translations are bundled locally
 - Do **not** remove `data-vocab-count` attributes or rename the values `"1"` / `"2"` / `"all"`.
 - Do **not** change the `class="level-count"` on those elements (the regex anchors on the full opening tag).
 - Do **not** change the wording `"translations are bundled locally"` — the script uses that as an anchor.
-- After any change to `topik-vocab.json`, always run `pnpm update-counts` to keep the landing page in sync.
-- After any visual change to `docs/index.html`, always run `pnpm screenshot` to regenerate the screenshots (see [Screenshots](#screenshots) below).
+- See [Automation](#automation) for when to re-run these scripts.
 
 ---
 
@@ -506,6 +505,40 @@ Every entry must conform to:
 **Rules:**
 - `level` must be integer `1` or `2`; the popup filter and `update-vocab-counts.mjs` both rely on this.
 - After editing vocab, run `pnpm update-counts` (landing page) and `pnpm test` (data integrity).
+
+---
+
+## Automation
+
+Certain source files have downstream artifacts that must be kept in sync manually. Run the corresponding command whenever a trigger changes.
+
+| Trigger | Command | What it does |
+|---|---|---|
+| `src/assets/topik-vocab.json` changes | `pnpm update-counts` | Patches word counts in `docs/index.html` |
+| `docs/index.html` changes visually | `pnpm screenshot` | Regenerates `.github/images/` PNGs for README + Chrome Web Store |
+| `src/public/icon/icon.svg` changes | `pnpm generate-icons` | Rebuilds `16.png`, `48.png`, `128.png` in `src/public/icon/` |
+| New vocab words need translating | `node scripts/batch-translate.js` | Calls Azure OpenAI, outputs `topik-vocab-translated.json` |
+
+### Batch translation workflow
+
+Requires `AZURE_OPENAI_KEY` env var. Safe workflow to avoid overwriting good data:
+
+```powershell
+$env:AZURE_OPENAI_KEY="<your-key>"
+node scripts/batch-translate.js
+# Review src/assets/topik-vocab-translated.json
+Move-Item src/assets/topik-vocab-translated.json src/assets/topik-vocab.json -Force
+pnpm test   # verify data integrity
+```
+
+### Screenshots
+
+Both images are captured from `docs/index.html` via headless Chrome (Puppeteer). No server needed — the script opens the local HTML file directly.
+
+| File | Dimensions | Used for |
+|---|---|---|
+| `.github/images/landingpage.png` | 1280×700, nav hidden | README hero image |
+| `.github/images/landingpage-1280x800.png` | 1280×800, full page | Chrome Web Store marquee tile |
 
 ---
 
@@ -585,24 +618,6 @@ pnpm test          # Run automated test suite
 pnpm test:watch    # Tests in watch mode
 pnpm zip           # Create distributable ZIP
 pnpm update-counts # Sync vocab counts in docs/index.html from JSON
-pnpm screenshot    # Regenerate store + README screenshots (see below)
+pnpm screenshot    # Regenerate store + README screenshots
+pnpm generate-icons # Rebuild icon PNGs from icon.svg
 ```
-
----
-
-### Screenshots
-
-Screenshots are generated from `docs/index.html` via headless Chrome (Puppeteer) and stored in `.github/images/`.
-
-| File | Size | Used for |
-|---|---|---|
-| `landingpage.png` | 1280×700 — nav hidden | README hero image |
-| `landingpage-1280x800.png` | 1280×800 — full page | Chrome Web Store listing (marquee tile) |
-
-**Regenerate after any visual change to `docs/index.html`:**
-
-```bash
-pnpm screenshot
-```
-
-The script (`scripts/screenshot.mjs`) opens the local HTML file, waits for transitions to settle, captures both crops, and exits. No server needed.
