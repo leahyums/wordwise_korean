@@ -7,6 +7,8 @@
  *   3. Verbose "to X / being X" prefixes removed for cleaner annotations
  *   4. Shorter/more concise translation chosen over longer equivalent
  *   5. New TOPIK II words are present with correct translations
+ *   6. Chinese (zh) translation coverage and quality
+ *   7. Japanese (ja) translation coverage and quality
  */
 
 import { describe, it, expect } from 'vitest';
@@ -18,6 +20,12 @@ const vocabMap = new Map(vocab.map(w => [w.word, w]));
 
 function en(word: string): string | undefined {
   return vocabMap.get(word)?.translations.en;
+}
+function zh(word: string): string | undefined {
+  return vocabMap.get(word)?.translations.zh;
+}
+function ja(word: string): string | undefined {
+  return vocabMap.get(word)?.translations.ja;
 }
 
 // ─── 1. Data integrity ────────────────────────────────────────────────────────
@@ -179,5 +187,146 @@ describe('Known issues', () => {
     expect(entry?.translations.en).toBe('professional');
     // Mark this test as a known risk (not blocking)
     console.warn('[KNOWN ISSUE] "가" in vocab may shadow 가다 stem matching');
+  });
+});
+
+// ─── 7. Chinese (zh) translation coverage ────────────────────────────────────
+
+describe('Chinese (zh) translation coverage', () => {
+  it('every entry has a non-empty zh translation', () => {
+    const missing = vocab.filter(w => !w.translations.zh || w.translations.zh.trim() === '');
+    expect(missing.map(w => w.word)).toEqual([]);
+  });
+
+  it('zh translations are not just copies of the English translation', () => {
+    const sameAsEn = vocab.filter(w =>
+      w.translations.zh &&
+      w.translations.zh.trim().toLowerCase() === w.translations.en.trim().toLowerCase()
+    );
+    expect(sameAsEn.map(w => w.word)).toEqual([]);
+  });
+
+  it('zh translations contain at least one CJK character', () => {
+    const cjkRegex = /[\u4e00-\u9fff\u3400-\u4dbf]/;
+    const nonCjk = vocab.filter(w => w.translations.zh && !cjkRegex.test(w.translations.zh));
+    expect(nonCjk.map(w => `${w.word}="${w.translations.zh}"`)).toEqual([]);
+  });
+
+  it('zh coverage is 100% (all 6,065 words)', () => {
+    const filled = vocab.filter(w => w.translations.zh && w.translations.zh.trim() !== '').length;
+    expect(filled).toBe(vocab.length);
+  });
+});
+
+// ─── 8. Chinese (zh) spot-check quality ──────────────────────────────────────
+
+describe('Chinese (zh) spot-check quality', () => {
+  const checks: [string, string][] = [
+    ['가다',  '去'],
+    ['오다',  '来'],
+    ['먹다',  '吃'],
+    ['사람',  '人'],
+    ['학교',  '学校'],
+    ['한국',  '韩国'],
+    ['물',    '水'],
+    ['시간',  '时间'],
+    ['돈',    '钱'],
+    ['좋다',  '好'],
+    ['크다',  '大'],
+    ['작다',  '小'],
+    ['있다',  '有/在'],
+    ['없다',  '没有/不在'],
+    ['가족',  '家人'],
+    ['친구',  '朋友'],
+    ['공부',  '学习'],
+    ['사랑',  '爱'],
+    ['나라',  '国家'],
+    ['일',    '日'],
+    ['개념',  '概念'],
+    ['가치관','价值观'],
+    ['경험',  '经验'],
+    ['문화',  '文化'],
+    ['사회',  '社会'],
+  ];
+
+  checks.forEach(([word, expected]) => {
+    it(`${word} → "${expected}"`, () => {
+      expect(zh(word)).toBe(expected);
+    });
+  });
+});
+
+// ─── 9. Japanese (ja) translation coverage ───────────────────────────────────
+
+describe('Japanese (ja) translation coverage', () => {
+  it('every entry has a non-empty ja translation', () => {
+    const missing = vocab.filter(w => !w.translations.ja || w.translations.ja.trim() === '');
+    expect(missing.map(w => w.word)).toEqual([]);
+  });
+
+  it('ja translations are not just copies of the English translation', () => {
+    // Allow legitimate loanwords/abbreviations that are identical in both languages (DVD, CD, etc.)
+    const loanwords = new Set(['디브이디', '시디']);
+    const sameAsEn = vocab.filter(w =>
+      !loanwords.has(w.word) &&
+      w.translations.ja &&
+      w.translations.ja.trim().toLowerCase() === w.translations.en.trim().toLowerCase()
+    );
+    expect(sameAsEn.map(w => w.word)).toEqual([]);
+  });
+
+  it('ja translations contain at least one Japanese/CJK character (loanwords excepted)', () => {
+    // Hiragana, Katakana, or CJK
+    const jaCharRegex = /[\u3040-\u30ff\u4e00-\u9fff]/;
+    // Allow known abbreviations that use Roman letters even in Japanese
+    const loanwords = new Set(['디브이디', '시디']);
+    const nonJa = vocab.filter(w =>
+      !loanwords.has(w.word) &&
+      w.translations.ja &&
+      !jaCharRegex.test(w.translations.ja)
+    );
+    expect(nonJa.map(w => `${w.word}="${w.translations.ja}"`)).toEqual([]);
+  });
+
+  it('ja coverage is 100% (all 6,065 words)', () => {
+    const filled = vocab.filter(w => w.translations.ja && w.translations.ja.trim() !== '').length;
+    expect(filled).toBe(vocab.length);
+  });
+});
+
+// ─── 10. Japanese (ja) spot-check quality ────────────────────────────────────
+
+describe('Japanese (ja) spot-check quality', () => {
+  const checks: [string, string][] = [
+    ['가다',  '行く'],
+    ['오다',  '来る'],
+    ['먹다',  '食べる'],
+    ['사람',  '人'],
+    ['학교',  '学校'],
+    ['한국',  '韓国'],
+    ['물',    '水'],
+    ['시간',  '時間'],
+    ['돈',    'お金'],
+    ['좋다',  '良い'],
+    ['크다',  '大きい'],
+    ['작다',  '小さい'],
+    ['있다',  'ある/いる'],
+    ['없다',  'ない'],
+    ['가족',  '家族'],
+    ['친구',  '友達'],
+    ['공부',  '勉強'],
+    ['사랑',  '愛'],
+    ['나라',  '国'],
+    ['일',    '日'],
+    ['개념',  '概念'],
+    ['경험',  '経験'],
+    ['문화',  '文化'],
+    ['사회',  '社会'],
+  ];
+
+  checks.forEach(([word, expected]) => {
+    it(`${word} → "${expected}"`, () => {
+      expect(ja(word)).toBe(expected);
+    });
   });
 });
