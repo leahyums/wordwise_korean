@@ -4,21 +4,17 @@ This directory contains the raw source text files for TOPIK vocabulary and instr
 
 ---
 
-## 📁 Source Files
+## 📁 Original Sources
 
-### `topik-1671-words.txt`
-- **Source**: [TOPIK I Vocabulary List (Tammy Korean)](https://learning-korean.com/elementary/20210101-10466/)
-- **Content**: 1,671 TOPIK I vocabulary words
-- **Format**: PDF text extract with "No. 한글 English" columnar format
-- **Used by**: `scripts/pdf-to-vocab.js --level 1`
-- **Result**: 1,668 unique words imported (99.8% success rate)
+The raw source files have been processed and deleted. The vocabulary is fully consolidated in `src/assets/topik-vocab.json`.
 
-### `topik-2662-words.txt`
-- **Source**: [TOPIK Ⅱ Vocabulary List (Tammy Korean)](https://learning-korean.com/intermediate/20220630-12696/)
-- **Content**: 2,662 TOPIK II vocabulary words (Intermediate/Advanced)
-- **Format**: PDF text extract with "No. 한글 English" columnar format
-- **Used by**: `scripts/pdf-to-vocab.js --level 2 --merge`
-- **Result**: 2,660 unique words imported, merged to 4,341 total words
+| Source | Words | Notes |
+|---|---|---|
+| [TOPIK I — Tammy Korean](https://learning-korean.com/elementary/20210101-10466/) | 1,671 | PDF word list |
+| [TOPIK II — Tammy Korean](https://learning-korean.com/intermediate/20220630-12696/) | 2,662 | PDF word list |
+| [koreantopik.com](https://koreantopik.com/) | ~3,900 | Scraped via `scrape-topik2-3900.py` |
+
+After merging, deduplication, and quality pass: **6,065 words** in `src/assets/topik-vocab.json`.
 
 ---
 
@@ -61,69 +57,15 @@ Edit `src/assets/topik-vocab.json` directly:
 }
 ```
 
-### Method 2: Import from CSV
+### Method 2: Batch Translate
 
-```bash
-# Convert CSV to JSON
-node scripts/csv-to-vocab.js mywords.csv --merge
-
-# CSV format: word,level,en,zh,ja
-# Example:
-# 친구,1,friend,朋友,友達
-# 학교,1,school,学校,学校
-```
-
-### Method 3: Parse PDF Text
-
-```bash
-# Extract text from PDF and parse
-node scripts/pdf-to-vocab.js extracted-text.txt --level 1 --merge
-```
-
-### Method 4: Batch Translate
-
-```bash
-# Auto-translate missing languages using AI
-node scripts/batch-translate.js src/assets/topik-vocab.json
+```powershell
+# Auto-translate missing zh/ja using Azure OpenAI
+$env:AZURE_OPENAI_KEY="<your-key>"
+node scripts/batch-translate.js
 ```
 
 See [scripts/README.md](../scripts/README.md) for detailed documentation on all scripts.
-
----
-
-## 🔧 How to Extract Text from PDF
-
-1. **Download PDF** from the source links above
-2. **Open in browser** or PDF reader
-3. **Select all text**: Ctrl+A (Windows) or Cmd+A (Mac)
-4. **Copy**: Ctrl+C or Cmd+C
-5. **Paste into text file**: Save as UTF-8 encoding
-6. **Run parser**:
-   ```bash
-   # For TOPIK I
-   node scripts/pdf-to-vocab.js data/topik-1671-words.txt --level 1
-   
-   # For TOPIK II (merge with TOPIK I)
-   node scripts/pdf-to-vocab.js data/topik-2662-words.txt --level 2 --merge
-   ```
-
-### Text Format Example
-
-```
-TOPIKⅠVocabulary（Beginner)
-No. 한글 English No. 한글 English
-1 가게 store, shop 41 감사하다 thank, appreciate
-2 가격 price 42 감사합니다 thank you
-3 가깝다 to be close 43 같다 to be the same
-...
-```
-
-The parser handles:
-- Two-column format (left and right columns)
-- Number prefixes (1, 2, 3...)
-- Korean words (한글)
-- English translations
-- Section headers (automatically skipped)
 
 ---
 
@@ -139,9 +81,8 @@ The parser handles:
 5. **Anki Decks** - Search "TOPIK" on AnkiWeb, export to CSV
 
 **Steps:**
-1. Download word list (usually Excel/CSV)
-2. Convert to JSON format using `csv-to-vocab.js`
-3. Merge with existing vocabulary
+1. Download word list (usually Excel/CSV or JSON)
+2. Manually add entries to `src/assets/topik-vocab.json` following the existing schema, then run `pnpm update-counts` and `pnpm test`
 
 ### Option 2: Use National Institute of Korean Language API
 
@@ -173,24 +114,20 @@ async function fetchKRDICT(word) {
 
 ## 🔄 Regenerating Vocabulary
 
-To rebuild the vocabulary from scratch:
+The vocabulary is already fully built. The txt files in this directory are kept as source references only.
 
-```bash
-# Step 1: Parse TOPIK I (1,578 words)
-node scripts/pdf-to-vocab.js data/topik-1671-words.txt --level 1
+To re-scrape and re-merge the TOPIK II extended list (e.g. to pick up new words from koreantopik.com):
 
-# Step 2: Merge TOPIK II PDF vocabulary
-node scripts/pdf-to-vocab.js data/topik-2662-words.txt --level 2 --merge
+```powershell
+# Re-scrape from koreantopik.com
+python scripts/scrape-topik2-3900.py   # outputs src/assets/topik2-3900-vocab.json
 
-# Apply the PDF-based vocabulary (4,341 words)
-Move-Item src/assets/topik-vocab-from-pdf.json src/assets/topik-vocab.json -Force
+# Merge into topik-vocab.json
+python scripts/merge-topik2-vocab.py
 
-# Step 3: Scrape and merge TOPIK II extended list from koreantopik.com (~2,000 more words)
-python scripts/scrape-topik2-3900.py          # generates src/assets/topik2-3900-vocab.json
-python scripts/merge-topik2-vocab.py          # merges into topik-vocab.json → 6,349 words
-
-# Rebuild extension
-pnpm dev
+# Sync counts + verify
+pnpm update-counts
+pnpm test
 ```
 
 ---
@@ -226,17 +163,18 @@ ruby.word-wise-highlight {
 
 ### Using the Batch Translation Script:
 
-```bash
-# Set your API key (OpenAI example)
-export OPENAI_API_KEY="sk-..."
+```powershell
+# Set your Azure OpenAI key
+$env:AZURE_OPENAI_KEY="<your-key>"
 
-# Run batch translation
-node scripts/batch-translate.js src/assets/topik-vocab.json
+# Run batch translation (reads topik-vocab.json, writes topik-vocab-translated.json)
+node scripts/batch-translate.js
 
-# This will update missing Chinese/Japanese translations
+# Review output, then replace
+Move-Item src/assets/topik-vocab-translated.json src/assets/topik-vocab.json -Force
 ```
 
-See the script for other API providers (Anthropic, Google, etc.)
+See [scripts/README.md](../scripts/README.md) for full details.
 
 ---
 
@@ -286,11 +224,7 @@ Check browser console for:
 
 ## 🎯 Usage in Extension
 
-These source files are **not** loaded by the extension. They are:
-1. Parsed by `pdf-to-vocab.js` to create JSON
-2. Output to `src/assets/topik-vocab-from-pdf.json`
-3. Manually moved to `src/assets/topik-vocab.json`
-4. Bundled into the extension at build time
+These source files are **not** loaded by the extension. They are kept as reference text for the original TOPIK word lists. The processed vocabulary lives in `src/assets/topik-vocab.json`, which is bundled into the extension at build time.
 
 ---
 
@@ -304,21 +238,12 @@ These source files are **not** loaded by the extension. They are:
 
 ## 🗺️ Recommended Workflow
 
-### Phase 1: Get Core Vocabulary ✅ COMPLETED
-1. ✅ Downloaded TOPIK I word list (1,671 words)
-2. ✅ Parsed and imported 1,668 unique words
-3. ✅ Added to `topik-vocab.json`
+### Phase 1–2.5: Vocabulary Build ✅ COMPLETED
+1. ✅ TOPIK I (Tammy Korean PDF) — 1,668 words
+2. ✅ TOPIK II (Tammy Korean PDF) — merged to 4,341 words
+3. ✅ TOPIK II extended (koreantopik.com scrape) — deduplicated + quality pass → **6,065 total words**
 
-### Phase 2: Expand to Full TOPIK II (PDF) ✅ COMPLETED
-1. ✅ Downloaded TOPIK II additions (2,662 words)
-2. ✅ Parsed and imported 2,660 unique words
-3. ✅ Merged with existing file → **4,341 total words**
-
-### Phase 2.5: Extend via Web Scraping (koreantopik.com) ✅ COMPLETED
-1. ✅ Scraped TOPIK II vocabulary from koreantopik.com using `scrape-topik2-3900.py`
-2. ✅ Generated `src/assets/topik2-3900-vocab.json` (~3,900 entries)
-3. ✅ Merged into `topik-vocab.json` using `merge-topik2-vocab.py`
-4. ✅ Deduplicated (277 entries) and translation quality pass (260 verbose prefixes stripped) → **6,065 total words**
+Source files have been deleted; vocabulary is in `src/assets/topik-vocab.json`.
 
 ### Phase 3: Conjugation Handling ✅ IMPLEMENTED
 1. ✅ Stem extraction algorithm handles most cases
@@ -336,8 +261,8 @@ These source files are **not** loaded by the extension. They are:
 
 **1 Hour Project:**
 1. Download a TOPIK I CSV from TOPIK Guide
-2. Use ChatGPT to convert to JSON format
-3. Merge with current file using `csv-to-vocab.js --merge`
+2. Manually add missing entries to `src/assets/topik-vocab.json` (or use ChatGPT to batch-convert to the JSON schema)
+3. Run `pnpm update-counts && pnpm test`
 4. → You'll have even more words!
 
 **1 Week Project (Carefully Curated):**
