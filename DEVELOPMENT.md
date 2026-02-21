@@ -395,6 +395,135 @@ console.timeEnd('processNode');
 
 ---
 
+## Contracts & Dependencies
+
+These are the **cross-file coupling points** where a rename or restructure in one place will silently break something else. Always update *all* sides of a contract together.
+
+---
+
+### 1. Annotation HTML contract — `ruby.word-wise-korean`
+
+**Produced by:** `src/utils/annotator.ts` (`ANNOTATION_CLASS = 'word-wise-korean'`)
+
+**Consumed by:**
+
+| Consumer | What it uses |
+|----------|--------------|
+| `src/entrypoints/content.ts` | CSS rules `ruby.word-wise-korean` and `ruby.word-wise-korean rt` |
+| `docs/demo-x.html` | CSS rules `ruby.word-wise-korean` and `ruby.word-wise-korean rt`; `setLang()` uses `document.querySelectorAll('ruby.word-wise-korean rt')` |
+
+**Rules:**
+- The class name `word-wise-korean` must match across all three files.
+- The `<rt>` element is the **first child** of `<ruby>` and holds the translation text.
+- `setLang()` in `demo-x.html` caches the original English text in `rt.dataset.en` on first run. If the HTML in `demo-x.html` changes to a different structure (e.g. `rt` after the Korean text), the language switcher will break.
+
+**HTML shape:**
+```html
+<ruby class="word-wise-korean">한국어<rt>Korean language</rt></ruby>
+```
+
+---
+
+### 2. Landing page vocab counts — `data-vocab-count` attributes
+
+**Written by:** `scripts/update-vocab-counts.mjs` (run via `pnpm update-counts`)
+
+**Read from / patched in:** `docs/index.html`
+
+The script targets these exact elements (matched by regex):
+
+```html
+<div class="level-count" data-vocab-count="1">1,578</div>
+<div class="level-count" data-vocab-count="2">4,486</div>
+<div class="level-count" data-vocab-count="all">6,064</div>
+```
+
+It also patches this sentence pattern:
+
+```html
+All 6,064 translations are bundled locally
+```
+
+**Rules:**
+- Do **not** remove `data-vocab-count` attributes or rename the values `"1"` / `"2"` / `"all"`.
+- Do **not** change the `class="level-count"` on those elements (the regex anchors on the full opening tag).
+- Do **not** change the wording `"translations are bundled locally"` — the script uses that as an anchor.
+- After any change to `topik-vocab.json`, always run `pnpm update-counts` to keep the landing page in sync.
+
+---
+
+### 3. Demo iframe language switcher — postMessage protocol
+
+**Sender:** `docs/index.html` (tab click handler at bottom of file)
+
+**Receiver:** `docs/demo-x.html` (`window.addEventListener('message', ...)`)
+
+**Message shape:**
+```js
+{ type: 'setLang', lang: 'en' | 'zh' | 'ja' }
+```
+
+**Coupling points in `index.html`:**
+
+| Element | Attribute | Value |
+|---------|-----------|-------|
+| `<button class="demo-lang-tab">` | `data-lang` | `"en"` \| `"zh"` \| `"ja"` |
+| `<iframe>` inside `.demo-wrap` | (selector) | must match `document.querySelector('.demo-wrap iframe')` |
+
+**Rules:**
+- Renaming `.demo-lang-tab` or `.demo-wrap` breaks the JS tab handler.
+- The `lang` values in `data-lang` must match the keys in the `TRANS` lookup object in `demo-x.html` (`'zh'` and `'ja'`; `'en'` is the fallback).
+- Adding a new language requires: a new `<button data-lang="...">` in `index.html`, and a corresponding key added to every entry in the `TRANS` object in `demo-x.html`.
+- The `setLang()` function stores the original EN text in `rt.dataset.en` on first call. New `<rt>` elements added to the demo HTML must contain **English** text initially.
+
+---
+
+### 4. Popup word counts — dynamic derivation from JSON
+
+**Source:** `src/assets/topik-vocab.json` (each entry has a `level` field: `1` or `2`)
+
+**Consumed by:** `src/entrypoints/popup/App.vue`
+
+```ts
+const vocabCounts = {
+  1: _vocab.filter(e => e.level === 1).length,
+  2: _vocab.filter(e => e.level === 2).length,
+  all: _vocab.length,
+};
+```
+
+**Rules:**
+- The `level` field in JSON entries must be the integer `1` or `2` (not a string).
+- There are no hardcoded counts in the popup — counts are always derived at build time.
+- No action needed when vocab changes; counts update automatically on the next `pnpm build` / `pnpm dev`.
+
+---
+
+### 5. Vocab JSON schema
+
+**File:** `src/assets/topik-vocab.json`
+
+Every entry must conform to:
+
+```ts
+{
+  word: string,        // Korean dictionary form
+  level: 1 | 2,       // TOPIK level (integer)
+  pos: string,        // part-of-speech tag (e.g. "noun", "verb", "adjective")
+  translations: {
+    en: string,        // English translation (short, no parentheticals)
+    zh: string,        // Simplified Chinese
+    ja: string,        // Japanese
+  }
+}
+```
+
+**Rules:**
+- `level` must be integer `1` or `2`; the popup filter and `update-vocab-counts.mjs` both rely on this.
+- After editing vocab, run `pnpm update-counts` (landing page) and `pnpm test` (data integrity).
+
+---
+
 ## Quick Reference
 
 ### Important Files
