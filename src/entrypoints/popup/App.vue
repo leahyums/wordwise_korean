@@ -49,6 +49,21 @@
         <p class="setting-hint">{{ levelHint }}</p>
       </div>
 
+      <!-- Translation Language -->
+      <div class="setting-group">
+        <label class="setting-label">Translation Language</label>
+        <div class="level-pills">
+          <button
+            v-for="(label, val) in { en: '🇬🇧 EN', zh: '🇨🇳 ZH', ja: '🇯🇵 JA' }"
+            :key="val"
+            class="pill-btn"
+            :class="{ active: config.targetLanguage === val }"
+            @click="config.targetLanguage = val as 'en' | 'zh' | 'ja'; saveConfig()"
+          >{{ label }}</button>
+        </div>
+        <p class="setting-hint">{{ langHint }}</p>
+      </div>
+
       <!-- Font Size -->
       <div class="setting-group">
         <label class="setting-label">
@@ -126,6 +141,15 @@ const levelHint = computed(() => {
       return 'All levels (6,065 words)';
     default:
       return '';
+  }
+});
+
+const langHint = computed(() => {
+  switch (config.value.targetLanguage) {
+    case 'en': return 'English translations';
+    case 'zh': return 'Simplified Chinese translations';
+    case 'ja': return 'Japanese translations';
+    default:   return '';
   }
 });
 

@@ -11,6 +11,7 @@ A browser extension that adds Kindle Word Wise style annotations for Korean lang
 ## ✨ Features
 
 - **6,065 TOPIK words** — I (beginner) · II (intermediate) · or all levels
+- **3 translation languages** — English, Simplified Chinese, Japanese
 - **Always-visible annotations** — translations above words, no hover needed
 - **Smart conjugation matching** — handles verb/adjective forms and noun/verb ambiguity
 - **Clean translations** — parentheticals and verbose prefixes stripped automatically
@@ -84,8 +85,9 @@ Output will be in `.output/` directory.
    - **TOPIK I**: Basic vocabulary (1,578 words)
    - **TOPIK Ⅱ**: Intermediate/Advanced (4,487 words)
    - **All**: Complete vocabulary (6,065 words)
-4. Adjust settings like translation size and highlighting
-5. Visit any Korean website and see translations appear!
+4. Select your translation language: **English**, **Chinese**, or **Japanese**
+5. Adjust settings like translation size and highlighting
+6. Visit any Korean website and see translations appear!
 
 ## 🏗️ Project Structure
 
