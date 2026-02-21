@@ -1,24 +1,35 @@
 <template>
   <div class="popup-container">
     <header class="header">
-      <h1 class="title">📚 WordWise Korean</h1>
-      <p class="subtitle">Learn vocabulary while browsing</p>
+      <div class="header-inner">
+        <div class="logo-mark">W</div>
+        <div>
+          <h1 class="title">WordWise Korean</h1>
+          <p class="subtitle">Inline translations while you browse</p>
+        </div>
+      </div>
     </header>
 
     <main class="content">
       <!-- Enable/Disable Toggle -->
       <div class="setting-group">
-        <label class="toggle-container">
-          <input
-            type="checkbox"
-            v-model="config.enabled"
-            @change="saveConfig"
-            class="toggle-input"
-          />
-          <span class="toggle-label">
-            {{ config.enabled ? '✓ Enabled' : '✗ Disabled' }}
-          </span>
-        </label>
+        <div class="toggle-row">
+          <div>
+            <span class="setting-label">Annotations</span>
+            <p class="setting-hint">Show translations above Korean words</p>
+          </div>
+          <label class="toggle-container">
+            <input
+              type="checkbox"
+              v-model="config.enabled"
+              @change="saveConfig"
+              class="toggle-input"
+            />
+            <span class="toggle-track">
+              <span class="toggle-thumb"></span>
+            </span>
+          </label>
+        </div>
       </div>
 
       <div class="divider"></div>
@@ -26,40 +37,23 @@
       <!-- Vocabulary Level -->
       <div class="setting-group">
         <label class="setting-label">Vocabulary Level</label>
-        <select 
-          v-model.number="config.level" 
-          @change="saveConfig"
-          class="select-input"
-        >
-          <option :value="1">TOPIK I</option>
-          <option :value="2">TOPIK Ⅱ</option>
-          <option :value="3">All</option>
-        </select>
-        <p class="setting-hint">
-          {{ levelHint }}
-        </p>
-      </div>
-
-      <!-- Translation Language -->
-      <div class="setting-group">
-        <label class="setting-label">Translation Language</label>
-        <select 
-          v-model="config.targetLanguage" 
-          @change="saveConfig"
-          class="select-input"
-        >
-          <option value="en">🇬🇧 English</option>
-          <!-- Chinese and Japanese coming soon -->
-        </select>
-        <p class="setting-hint" style="color: #a0aec0; font-style: italic;">
-          Chinese & Japanese translations coming soon!
-        </p>
+        <div class="level-pills">
+          <button
+            v-for="(label, val) in { 1: 'TOPIK I', 2: 'TOPIK Ⅱ', 3: 'All' }"
+            :key="val"
+            class="pill-btn"
+            :class="{ active: config.level === Number(val) }"
+            @click="config.level = Number(val); saveConfig()"
+          >{{ label }}</button>
+        </div>
+        <p class="setting-hint">{{ levelHint }}</p>
       </div>
 
       <!-- Font Size -->
       <div class="setting-group">
         <label class="setting-label">
-          Translation Size: {{ config.fontSize }}%
+          Translation Size
+          <span class="size-badge">{{ config.fontSize }}%</span>
         </label>
         <input
           type="range"
@@ -79,38 +73,38 @@
 
       <!-- Show Highlight -->
       <div class="setting-group">
-        <label class="checkbox-container">
-          <input
-            type="checkbox"
-            v-model="config.showHighlight"
-            @change="saveConfig"
-            class="checkbox-input"
-          />
-          <span class="checkbox-label">Highlight annotated words</span>
-        </label>
+        <div class="toggle-row">
+          <span class="setting-label">Highlight words</span>
+          <label class="toggle-container">
+            <input
+              type="checkbox"
+              v-model="config.showHighlight"
+              @change="saveConfig"
+              class="toggle-input"
+            />
+            <span class="toggle-track">
+              <span class="toggle-thumb"></span>
+            </span>
+          </label>
+        </div>
       </div>
 
       <div class="divider"></div>
 
-      <!-- Instructions -->
+      <!-- Landing page link -->
       <div class="info-section">
-        <h3 class="info-title">How to use:</h3>
-        <ol class="info-list">
-          <li>Enable the extension</li>
-          <li>Visit any Korean website</li>
-          <li>Translations appear above words!</li>
-        </ol>
+        <a class="landing-link" href="https://multilingual-lab.github.io/wordwise_korean/" target="_blank">
+          Visit homepage ↗
+        </a>
       </div>
 
       <!-- Save Status -->
-      <div v-if="saveStatus" class="save-status">
-        {{ saveStatus }}
-      </div>
+      <transition name="fade">
+        <div v-if="saveStatus" class="save-status">
+          {{ saveStatus }}
+        </div>
+      </transition>
     </main>
-
-    <footer class="footer">
-      <p class="footer-text">Made with ❤️ for Korean learners</p>
-    </footer>
   </div>
 </template>
 
@@ -161,231 +155,262 @@ async function saveConfig() {
 </script>
 
 <style scoped>
+/* ── Design tokens (mirrors landing page) ── */
+:root {
+  --bg:         #13131f;
+  --surface:    #1d1d2e;
+  --surface2:   #25253a;
+  --border:     #34344e;
+  --text:       #eeeef5;
+  --muted:      #8f8fb8;
+  --purple:     #8b5cf6;
+  --purple-hi:  #a78bfa;
+  --purple-lo:  #251550;
+  --radius:     12px;
+}
+
 .popup-container {
   width: 320px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: #ffffff;
-  color: #2d3748;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #13131f;
+  color: #eeeef5;
+  line-height: 1.5;
 }
 
+/* ── Header ── */
 .header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 20px;
-  text-align: center;
+  background: #1d1d2e;
+  border-bottom: 1px solid #34344e;
+  padding: 16px 18px;
 }
-
+.header-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 900;
+  font-size: 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(139,92,246,0.4);
+}
 .title {
   margin: 0;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
+  color: #eeeef5;
+  letter-spacing: -0.01em;
 }
-
 .subtitle {
-  margin: 5px 0 0;
-  font-size: 13px;
-  opacity: 0.9;
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: #8f8fb8;
 }
 
+/* ── Content ── */
 .content {
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .setting-group {
-  margin-bottom: 16px;
+  padding: 4px 0;
 }
 
 .setting-label {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 13px;
   font-weight: 600;
-  color: #4a5568;
+  color: #eeeef5;
   margin-bottom: 6px;
 }
 
-.select-input {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1.5px solid #e2e8f0;
-  border-radius: 6px;
-  font-size: 14px;
-  background: white;
-  cursor: pointer;
-  transition: border-color 0.2s;
-}
-
-.select-input:focus {
-  outline: none;
-  border-color: #667eea;
+.size-badge {
+  margin-left: auto;
+  background: #25253a;
+  border: 1px solid #34344e;
+  border-radius: 999px;
+  padding: 1px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #a78bfa;
 }
 
 .setting-hint {
   margin: 4px 0 0;
-  font-size: 12px;
-  color: #718096;
+  font-size: 11px;
+  color: #8f8fb8;
+}
+
+/* ── Toggle row ── */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
 
 .toggle-container {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-}
-
-.toggle-input {
   position: relative;
-  width: 48px;
-  height: 26px;
-  appearance: none;
-  background: #cbd5e0;
-  border-radius: 13px;
   cursor: pointer;
-  transition: background 0.3s;
+  flex-shrink: 0;
 }
-
-.toggle-input:checked {
-  background: #667eea;
-}
-
-.toggle-input::before {
-  content: '';
+.toggle-input {
   position: absolute;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: white;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-track {
+  display: block;
+  width: 42px;
+  height: 24px;
+  background: #34344e;
+  border-radius: 999px;
+  transition: background 0.25s;
+  position: relative;
+}
+.toggle-input:checked + .toggle-track {
+  background: #8b5cf6;
+  box-shadow: 0 0 12px rgba(139,92,246,0.45);
+}
+.toggle-thumb {
+  position: absolute;
   top: 3px;
   left: 3px;
-  transition: transform 0.3s;
-}
-
-.toggle-input:checked::before {
-  transform: translateX(22px);
-}
-
-.toggle-label {
-  margin-left: 12px;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.checkbox-container {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-}
-
-.checkbox-input {
   width: 18px;
   height: 18px;
-  cursor: pointer;
-  accent-color: #667eea;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.25s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.toggle-input:checked + .toggle-track .toggle-thumb {
+  transform: translateX(18px);
 }
 
-.checkbox-label {
-  margin-left: 8px;
-  font-size: 14px;
+/* ── Level pills ── */
+.level-pills {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
 }
-
-.divider {
-  height: 1px;
-  background: #e2e8f0;
-  margin: 16px 0;
-}
-
-.info-section {
-  background: #f7fafc;
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid #e2e8f0;
-}
-
-.info-title {
-  margin: 0 0 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #4a5568;
-}
-
-.info-list {
-  margin: 0;
-  padding-left: 20px;
-  font-size: 13px;
-  line-height: 1.6;
-  color: #718096;
-}
-
-.save-status {
-  margin-top: 12px;
-  padding: 8px;
-  background: #f0fff4;
-  border: 1px solid #9ae6b4;
-  border-radius: 4px;
-  text-align: center;
-  font-size: 13px;
-  color: #22543d;
-  font-weight: 600;
-}
-
-.footer {
-  background: #f7fafc;
-  padding: 12px;
-  text-align: center;
-  border-top: 1px solid #e2e8f0;
-}
-
-.footer-text {
-  margin: 0;
+.pill-btn {
+  flex: 1;
+  padding: 6px 0;
+  border-radius: 8px;
+  border: 1px solid #34344e;
+  background: #1d1d2e;
+  color: #8f8fb8;
   font-size: 12px;
-  color: #718096;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: inherit;
+}
+.pill-btn:hover {
+  border-color: #8b5cf6;
+  color: #eeeef5;
+}
+.pill-btn.active {
+  background: #251550;
+  border-color: #8b5cf6;
+  color: #a78bfa;
+  box-shadow: 0 0 0 1px #8b5cf6 inset, 0 0 12px rgba(139,92,246,0.15);
 }
 
+/* ── Slider ── */
 .slider-input {
   width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: #e2e8f0;
+  height: 4px;
+  border-radius: 2px;
+  background: #34344e;
   outline: none;
   -webkit-appearance: none;
   appearance: none;
   cursor: pointer;
 }
-
 .slider-input::-webkit-slider-thumb {
   -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  background: #667eea;
+  background: #8b5cf6;
   cursor: pointer;
-  transition: background 0.2s;
+  box-shadow: 0 0 8px rgba(139,92,246,0.5);
+  transition: transform 0.15s;
 }
-
 .slider-input::-webkit-slider-thumb:hover {
-  background: #5568d3;
+  transform: scale(1.15);
 }
-
 .slider-input::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  background: #667eea;
+  background: #8b5cf6;
   cursor: pointer;
   border: none;
-  transition: background 0.2s;
 }
-
-.slider-input::-moz-range-thumb:hover {
-  background: #5568d3;
-}
-
 .size-labels {
   display: flex;
   justify-content: space-between;
-  margin-top: 4px;
-  font-size: 11px;
-  color: #a0aec0;
+  margin-top: 5px;
+  font-size: 10px;
+  color: #8f8fb8;
 }
+
+/* ── Divider ── */
+.divider {
+  height: 1px;
+  background: #34344e;
+  margin: 10px 0;
+}
+
+/* ── Info / landing link ── */
+.info-section {
+  background: #1d1d2e;
+  border: 1px solid #34344e;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+}
+.landing-link {
+  font-size: 12px;
+  color: #a78bfa;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.landing-link:hover {
+  color: #eeeef5;
+}
+
+/* ── Save status ── */
+.save-status {
+  margin-top: 8px;
+  padding: 7px 10px;
+  background: #1a0f35;
+  border: 1px solid #5b3d9e;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 12px;
+  color: #a78bfa;
+  font-weight: 600;
+}
+
+/* ── Fade transition ── */
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 </style>
