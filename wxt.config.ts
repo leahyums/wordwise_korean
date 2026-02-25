@@ -9,7 +9,7 @@ export default defineConfig({
     name: 'WordWise Korean',
     description: 'Add Word Wise style annotations to Korean text for language learning',
     version: '0.1.3',
-    permissions: ['storage', 'activeTab'],
+    permissions: ['storage'],
     host_permissions: ['<all_urls>'],
     content_scripts: [
       {
